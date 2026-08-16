@@ -133,6 +133,18 @@ class NacClient:
             sig.risk = 8.0 if sig.value.get("roaming") else 0.0
         return sig
 
+    def number_recycling(self, msisdn: str, before: str = "2026-06-16T00:00:00Z") -> Signal:
+        """CAMARA Number Recycling (bonus tool-belt signal): was this number
+        recycled to a new owner after `before`? Recycled number + bank account
+        still bound to the previous owner = account-takeover vector."""
+        now = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+        data, ms, err = self._post(
+            "passthrough/camara/v1/number-recycling/number-recycling/v0.2/check",
+            {"phoneNumber": msisdn, "specifiedDate": before}, 3.0)
+        if err:
+            return Signal("NUMBER_RECYCLING", None, 0.0, 0.0, now, degradation=f"UNAVAILABLE({err})", latency_ms=ms)
+        return Signal("NUMBER_RECYCLING", data, 1.0, 20.0 if data.get("phoneNumberRecycled") else 0.0, now, latency_ms=ms)
+
     def number_verify(self, msisdn: str, declared_multi_sim: bool, deadline_remaining: float) -> Signal:
         """3-legged OAuth consent flow requires a device browser (see docs pasted in
         HANDOFF.md). Headless prototype: degraded signal, honestly labeled."""

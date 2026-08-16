@@ -89,6 +89,22 @@ Deps: `pip install -r requirements.txt` (+ network-as-code installed).
 - Test-first caught: policy double-signing bug, rule-shadowing order,
   coverage-definition nuance. Keep TDD for any new rule.
 
+## 7.5 NOKIA PORTAL VERIFICATION (2026-08-16, evening)
+- User session cookie (connect.sid) EXPIRED 18:27Z — portal SPA renders empty.
+  If a logged-in scan is ever needed, ask user for FRESH cookies.
+- Did NOT need it: the API key alone unlocked more:
+  - OAuth client credentials obtained via GET /oauth2/v1/auth/clientcredentials
+    (stored in .env as NAC_OAUTH_CLIENT_ID/SECRET; endpoints auth.eu.nac.nokia.io).
+  - Discovery: authorization/token/fast-flow endpoints (fast-flow CSP endpoint
+    exists but 404/param-gated from server side — Phase 1 to wire the full
+    3-legged device consent; auth URL is demo-showable once obtained).
+  - NUMBER RECYCLING API works live: {"phoneNumberRecycled": true} — recycled
+    numbers are an account-takeover vector; wired into nac client + tool belt
+    as a bonus INVESTIGATION signal (inline rail stays 3 APIs as submitted).
+  - consent-info exists (needs purpose=dpv:... + requestCaptureUrl) — Phase 1.
+- Sandbox simulator +99999991000: SIM swapped AND number recycled (fraud-heavy
+  test profile). +99999991001: clean profile.
+
 ## 8. GIT STATE
 Local repo initialized at handoff time (see `git log`). Working tree = state
 described in §2. Branch: main.
