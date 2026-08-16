@@ -105,6 +105,30 @@ Deps: `pip install -r requirements.txt` (+ network-as-code installed).
 - Sandbox simulator +99999991000: SIM swapped AND number recycled (fraud-heavy
   test profile). +99999991001: clean profile.
 
+## 7.7 FRONTEND REBUILD (2026-08-16, night) — commit 9d685e6
+- `demo/ui/index.html` rewritten as a two-tab SPA for judges who know nothing:
+  - 📱 CUSTOMER tab: phone mockup ("Nile Bank — InstaPay"), payee card, amount,
+    5 scenario chips (SCEN dict), result overlay with emoji + bilingual AR/EN
+    messages, Face ID step-up button on ESCALATE (bioDone() shows "no SMS was
+    ever sent"), rotating progress steps during the call.
+  - 🖥 FRAUD OPS tab (the dashboard IS for the bank's fraud team, not the
+    customer): decision badge, band, risk gauge, step-up chips (✓ allowed /
+    ✗ prohibited — SMS crossed out on SIM-swap bands), signal confidence bars,
+    Behavior (bank) bar with real "N× amount vs history" figure, dual latency
+    3-cell (end-to-end / internal / budget), tripwire banner + investigate
+    button, copilot panel (explain/report/replay), audit chain status.
+  - "What just happened?" plain-language timeline (numbered sequentially,
+    early-exit path = 5 steps) + "Why this matters" card + header legend
+    (LIVE / AI / MOCK dots).
+- `ratio()` computes amount/mean from the ACTIVE scenario — was a hardcoded
+  "52" before (only correct for swap_spike).
+- QA: `deck/verify_ui.js` (node, playwright Edge) drives the flow, asserts
+  sequential dot numbers, dumps timeline text, re-captures screenshots to
+  evidence/portal/. AI vision review of both views: CLEAN.
+  GOTCHA: waitForSelector('#res.show') matches the initial "Checking…"
+  overlay — wait for timeline children instead.
+- git identity is repo-local: Tasdiq <tasdiq@local> (matches earlier commits).
+
 ## 8. GIT STATE
 Local repo initialized at handoff time (see `git log`). Working tree = state
 described in §2. Branch: main.
