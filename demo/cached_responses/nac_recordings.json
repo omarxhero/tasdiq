@@ -1,0 +1,35 @@
+{
+  "_note": "Recorded CAMARA sandbox responses. Used ONLY as labeled fallback when live calls fail (official guide tip: cache demo data). degradation=CACHED_FALLBACK, confidence=0.9.",
+  "+99999991000": {
+    "sim_swap": {
+      "swapped": true
+    },
+    "roaming": {
+      "lastStatusTime": "2026-08-16T19:18:17.227557Z",
+      "roaming": true,
+      "countryCode": 36,
+      "countryName": [
+        "HU"
+      ]
+    },
+    "connectivity": {
+      "connectivityStatus": "CONNECTED_SMS"
+    }
+  },
+  "+99999991001": {
+    "sim_swap": {
+      "swapped": false
+    },
+    "roaming": {
+      "lastStatusTime": "2026-08-16T19:18:21.935550Z",
+      "roaming": false,
+      "countryCode": 36,
+      "countryName": [
+        "HU"
+      ]
+    },
+    "connectivity": {
+      "connectivityStatus": "CONNECTED_DATA"
+    }
+  }
+}

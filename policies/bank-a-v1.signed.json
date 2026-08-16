@@ -1,0 +1,19 @@
+{
+  "policy_id": "bank-a-v1",
+  "bank": "A",
+  "rules": {
+    "decline_gte": 75,
+    "escalate_gte": 50,
+    "instant_multiplier": 40,
+    "min_signal_coverage": 0.5,
+    "swap_window_hours": 24,
+    "breaker_open_posture": {
+      "mode": "ESCALATE_ONLY",
+      "cap": 1000
+    }
+  },
+  "signatures": {
+    "maker": "b4df2d5b07947e417d65b21aa9679611ba1aeedbb6941ddbf6505796b1b08f33ec74effac7080a8f8797dcf069f6551be848a2bfc031d55362ce2ee053ad2807",
+    "checker": "454fb2d15f85f45ef839a96434b74bda538f2b6a9fc28cc7a492c60687add11defa432480e92595bb3145789448785bc86393011339f87ae2c580ee0efde730c"
+  }
+}

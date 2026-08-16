@@ -1,0 +1,42 @@
+{
+  "captured_at": "2026-08-16T20:43:29+0300",
+  "gateway": "https://network-as-code.p-eu.apihub.nokia.io",
+  "application": "default-application_20958",
+  "sim_swap_check": {
+    "request": {
+      "phoneNumber": "+99999991000",
+      "maxAge": 240
+    },
+    "response": {
+      "swapped": true
+    },
+    "latency_ms": 783
+  },
+  "device_status_roaming": {
+    "request": {
+      "device": {
+        "phoneNumber": "+99999991000"
+      }
+    },
+    "response": {
+      "lastStatusTime": "2026-08-16T17:43:31.047663Z",
+      "roaming": true,
+      "countryCode": 36,
+      "countryName": [
+        "HU"
+      ]
+    },
+    "latency_ms": 930
+  },
+  "device_status_connectivity": {
+    "request": {
+      "device": {
+        "phoneNumber": "+99999991000"
+      }
+    },
+    "response": {
+      "connectivityStatus": "CONNECTED_SMS"
+    },
+    "latency_ms": 878
+  }
+}

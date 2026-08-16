@@ -1,0 +1,635 @@
+{
+  "captured_at": "2026-08-16T22:32:32+0300",
+  "live": [
+    "CAMARA sandbox (SIM Swap, Device Status)",
+    "Gemini 2.5 Flash agent"
+  ],
+  "mocked": [
+    "InstaPay channel",
+    "biometric UI",
+    "Number Verify OAuth consent (degraded 0.30)"
+  ],
+  "clean_approve": {
+    "request": {
+      "txn_id": "ev-clean_approve-1786908752",
+      "msisdn": "+99999991001",
+      "amount": 250,
+      "account_mean": 400,
+      "beneficiary_first_seen_minutes": 525600,
+      "attempts_last_hour": 1,
+      "declared_multi_sim": false,
+      "region_tag": "CAIRO"
+    },
+    "response": {
+      "txn_id": "ev-clean_approve-1786908752",
+      "decision": "APPROVE",
+      "band": "CLEAN",
+      "weighted_risk": 0.0,
+      "total_risk": 0.0,
+      "reasons": [
+        {
+          "name": "SIM_SWAP",
+          "value": {
+            "swapped": false
+          },
+          "confidence": 0.9,
+          "risk": 0.0,
+          "fetched_at": "2026-08-16T19:32:32Z",
+          "source": "nokia_nac",
+          "operator": "SIM-OPERATOR-A",
+          "degradation": "CACHED_FALLBACK",
+          "latency_ms": 1155
+        },
+        {
+          "name": "NUMBER_VERIFY",
+          "value": "MATCH_ASSUMED",
+          "confidence": 0.3,
+          "risk": 0.0,
+          "fetched_at": "2026-08-16T19:32:34Z",
+          "source": "nokia_nac",
+          "operator": "SIM-OPERATOR-A",
+          "degradation": "AUTH_PENDING",
+          "latency_ms": 0
+        },
+        {
+          "name": "DEVICE_STATUS",
+          "value": null,
+          "confidence": 0.0,
+          "risk": 0.0,
+          "fetched_at": "2026-08-16T19:32:34Z",
+          "source": "nokia_nac",
+          "operator": "SIM-OPERATOR-A",
+          "degradation": "BUDGET_MISS",
+          "latency_ms": 0
+        }
+      ],
+      "step_up": {
+        "allowed": [],
+        "prohibited": []
+      },
+      "policy_id": "bank-a-v1",
+      "policy_version_hash": "sha256:0cde8a6a6a6dee6f506470539af04fb3143bd749f1a25c4c56cb0f2b6f5442ce",
+      "latency": {
+        "end_to_end_ms": 1168,
+        "internal_ms": 13,
+        "external_network_ms": 1155,
+        "budget_ms": 450
+      },
+      "tripwire": {},
+      "webhook_alert": {
+        "sent": true,
+        "ts": "19:32:34Z"
+      }
+    },
+    "wall_ms": 1557
+  },
+  "swap_spike": {
+    "request": {
+      "txn_id": "ev-swap_spike-1786908755",
+      "msisdn": "+99999991000",
+      "amount": 52000,
+      "account_mean": 1000,
+      "beneficiary_first_seen_minutes": 3,
+      "attempts_last_hour": 1,
+      "declared_multi_sim": false,
+      "region_tag": "ALEX"
+    },
+    "response": {
+      "txn_id": "ev-swap_spike-1786908755",
+      "decision": "DECLINE",
+      "band": "SIM_SWAP_INSTANT_PATTERN",
+      "weighted_risk": 0.0,
+      "total_risk": 0.0,
+      "reasons": [
+        {
+          "name": "SIM_SWAP",
+          "value": {
+            "swapped": true
+          },
+          "confidence": 0.9,
+          "risk": 40.0,
+          "fetched_at": "2026-08-16T19:32:35Z",
+          "source": "nokia_nac",
+          "operator": "SIM-OPERATOR-A",
+          "degradation": "CACHED_FALLBACK",
+          "latency_ms": 313
+        }
+      ],
+      "step_up": {
+        "allowed": [
+          "WEBAUTHN",
+          "IN_APP_BIOMETRIC"
+        ],
+        "prohibited": [
+          "SMS",
+          "VOICE"
+        ]
+      },
+      "policy_id": "bank-a-v1",
+      "policy_version_hash": "sha256:0cde8a6a6a6dee6f506470539af04fb3143bd749f1a25c4c56cb0f2b6f5442ce",
+      "latency": {
+        "end_to_end_ms": 316,
+        "internal_ms": 3,
+        "external_network_ms": 313,
+        "budget_ms": 450
+      },
+      "tripwire": {
+        "cluster_alert": false
+      },
+      "webhook_alert": {
+        "sent": true,
+        "ts": "19:32:35Z"
+      }
+    },
+    "wall_ms": 327
+  },
+  "dualsim_anomaly": {
+    "request": {
+      "txn_id": "ev-dualsim_anomaly-1786908756",
+      "msisdn": "+99999991001",
+      "amount": 6000,
+      "account_mean": 400,
+      "beneficiary_first_seen_minutes": 2,
+      "attempts_last_hour": 1,
+      "declared_multi_sim": true,
+      "region_tag": "GIZA"
+    },
+    "response": {
+      "txn_id": "ev-dualsim_anomaly-1786908756",
+      "decision": "ESCALATE",
+      "band": "DEGRADED_SIGNAL_ANOMALY",
+      "weighted_risk": 0.0,
+      "total_risk": 30.0,
+      "reasons": [
+        {
+          "name": "SIM_SWAP",
+          "value": {
+            "swapped": false
+          },
+          "confidence": 0.9,
+          "risk": 0.0,
+          "fetched_at": "2026-08-16T19:32:36Z",
+          "source": "nokia_nac",
+          "operator": "SIM-OPERATOR-A",
+          "degradation": "CACHED_FALLBACK",
+          "latency_ms": 715
+        },
+        {
+          "name": "NUMBER_VERIFY",
+          "value": "MATCH_ASSUMED",
+          "confidence": 0.3,
+          "risk": 0.0,
+          "fetched_at": "2026-08-16T19:32:37Z",
+          "source": "nokia_nac",
+          "operator": "SIM-OPERATOR-A",
+          "degradation": "DUAL_SIM_DECLARED",
+          "latency_ms": 0
+        },
+        {
+          "name": "DEVICE_STATUS",
+          "value": null,
+          "confidence": 0.0,
+          "risk": 0.0,
+          "fetched_at": "2026-08-16T19:32:37Z",
+          "source": "nokia_nac",
+          "operator": "SIM-OPERATOR-A",
+          "degradation": "BUDGET_MISS",
+          "latency_ms": 0
+        }
+      ],
+      "step_up": {
+        "allowed": [
+          "IN_APP_BIOMETRIC",
+          "WEBAUTHN"
+        ],
+        "prohibited": [
+          "SMS",
+          "VOICE"
+        ]
+      },
+      "policy_id": "bank-a-v1",
+      "policy_version_hash": "sha256:0cde8a6a6a6dee6f506470539af04fb3143bd749f1a25c4c56cb0f2b6f5442ce",
+      "latency": {
+        "end_to_end_ms": 716,
+        "internal_ms": 1,
+        "external_network_ms": 715,
+        "budget_ms": 450
+      },
+      "tripwire": {},
+      "webhook_alert": {
+        "sent": true,
+        "ts": "19:32:37Z"
+      }
+    },
+    "wall_ms": 727
+  },
+  "snatch_run": {
+    "request": {
+      "txn_id": "ev-snatch_run-1786908758",
+      "msisdn": "+99999991001",
+      "amount": 18000,
+      "account_mean": 400,
+      "beneficiary_first_seen_minutes": 1,
+      "attempts_last_hour": 6,
+      "declared_multi_sim": false,
+      "region_tag": "CAIRO"
+    },
+    "response": {
+      "txn_id": "ev-snatch_run-1786908758",
+      "decision": "ESCALATE",
+      "band": "BEHAVIORAL_ANOMALY",
+      "weighted_risk": 0.0,
+      "total_risk": 70.0,
+      "reasons": [
+        {
+          "name": "SIM_SWAP",
+          "value": {
+            "swapped": false
+          },
+          "confidence": 0.9,
+          "risk": 0.0,
+          "fetched_at": "2026-08-16T19:32:38Z",
+          "source": "nokia_nac",
+          "operator": "SIM-OPERATOR-A",
+          "degradation": "CACHED_FALLBACK",
+          "latency_ms": 313
+        },
+        {
+          "name": "NUMBER_VERIFY",
+          "value": "MATCH_ASSUMED",
+          "confidence": 0.3,
+          "risk": 0.0,
+          "fetched_at": "2026-08-16T19:32:39Z",
+          "source": "nokia_nac",
+          "operator": "SIM-OPERATOR-A",
+          "degradation": "AUTH_PENDING",
+          "latency_ms": 0
+        },
+        {
+          "name": "DEVICE_STATUS",
+          "value": null,
+          "confidence": 0.0,
+          "risk": 0.0,
+          "fetched_at": "2026-08-16T19:32:39Z",
+          "source": "nokia_nac",
+          "operator": "SIM-OPERATOR-A",
+          "degradation": "BUDGET_MISS",
+          "latency_ms": 0
+        }
+      ],
+      "step_up": {
+        "allowed": [
+          "IN_APP_BIOMETRIC"
+        ],
+        "prohibited": [
+          "SMS"
+        ]
+      },
+      "policy_id": "bank-a-v1",
+      "policy_version_hash": "sha256:0cde8a6a6a6dee6f506470539af04fb3143bd749f1a25c4c56cb0f2b6f5442ce",
+      "latency": {
+        "end_to_end_ms": 314,
+        "internal_ms": 1,
+        "external_network_ms": 313,
+        "budget_ms": 450
+      },
+      "tripwire": {},
+      "webhook_alert": {
+        "sent": true,
+        "ts": "19:32:39Z"
+      }
+    },
+    "wall_ms": 323
+  },
+  "tamper_demo": {
+    "status": 400,
+    "body": {
+      "valid": false,
+      "error": "signature invalid for 'maker' — tampered or wrong key"
+    }
+  },
+  "canary": {
+    "canary_passed": true,
+    "layers": [
+      "untrusted text excluded from context by construction",
+      "escaped data-binding in server-side templates",
+      "structural schema validation"
+    ],
+    "note": "hostile memo never reached model context"
+  },
+  "ai_explanation": {
+    "explanation_en": "Transaction escalated by band SIM_SWAP_INSTANT_PATTERN; telecom and behavioral signals cited in ledger.",
+    "explanation_ar": "تم تصعيد المعاملة بناءً على إشارات الاتصالات والسلوك؛ التفاصيل في سجل التدقيق."
+  },
+  "ai_report": {
+    "report_en": "DRAFT — AI-generated, pending compliance officer review. Decision: DECLINE band SIM_SWAP_INSTANT_PATTERN.",
+    "report_ar": "مسودة — منتج آلي بانتظار مراجعة مسؤول الامتثال.",
+    "frameworks_cited": [
+      "CBE Anti-Fraud Framework"
+    ]
+  },
+  "trip_0": {
+    "request": {
+      "txn_id": "ev-trip_0-1786908763",
+      "msisdn": "+99999991000",
+      "amount": 52000,
+      "account_mean": 1000,
+      "beneficiary_first_seen_minutes": 3,
+      "attempts_last_hour": 1,
+      "declared_multi_sim": false,
+      "region_tag": "ALEX"
+    },
+    "response": {
+      "txn_id": "ev-trip_0-1786908763",
+      "decision": "DECLINE",
+      "band": "SIM_SWAP_INSTANT_PATTERN",
+      "weighted_risk": 0.0,
+      "total_risk": 0.0,
+      "reasons": [
+        {
+          "name": "SIM_SWAP",
+          "value": {
+            "swapped": true
+          },
+          "confidence": 1.0,
+          "risk": 40.0,
+          "fetched_at": "2026-08-16T19:32:43Z",
+          "source": "nokia_nac",
+          "operator": "SIM-OPERATOR-A",
+          "degradation": null,
+          "latency_ms": 570
+        }
+      ],
+      "step_up": {
+        "allowed": [
+          "WEBAUTHN",
+          "IN_APP_BIOMETRIC"
+        ],
+        "prohibited": [
+          "SMS",
+          "VOICE"
+        ]
+      },
+      "policy_id": "bank-a-v1",
+      "policy_version_hash": "sha256:0cde8a6a6a6dee6f506470539af04fb3143bd749f1a25c4c56cb0f2b6f5442ce",
+      "latency": {
+        "end_to_end_ms": 572,
+        "internal_ms": 2,
+        "external_network_ms": 570,
+        "budget_ms": 450
+      },
+      "tripwire": {
+        "cluster_alert": false
+      },
+      "webhook_alert": {
+        "sent": true,
+        "ts": "19:32:44Z"
+      }
+    },
+    "wall_ms": 582
+  },
+  "trip_1": {
+    "request": {
+      "txn_id": "ev-trip_1-1786908765",
+      "msisdn": "+99999991000",
+      "amount": 52000,
+      "account_mean": 1000,
+      "beneficiary_first_seen_minutes": 3,
+      "attempts_last_hour": 1,
+      "declared_multi_sim": false,
+      "region_tag": "ALEX"
+    },
+    "response": {
+      "txn_id": "ev-trip_1-1786908765",
+      "decision": "DECLINE",
+      "band": "SIM_SWAP_INSTANT_PATTERN",
+      "weighted_risk": 0.0,
+      "total_risk": 0.0,
+      "reasons": [
+        {
+          "name": "SIM_SWAP",
+          "value": {
+            "swapped": true
+          },
+          "confidence": 0.9,
+          "risk": 40.0,
+          "fetched_at": "2026-08-16T19:32:45Z",
+          "source": "nokia_nac",
+          "operator": "SIM-OPERATOR-A",
+          "degradation": "CACHED_FALLBACK",
+          "latency_ms": 455
+        }
+      ],
+      "step_up": {
+        "allowed": [
+          "WEBAUTHN",
+          "IN_APP_BIOMETRIC"
+        ],
+        "prohibited": [
+          "SMS",
+          "VOICE"
+        ]
+      },
+      "policy_id": "bank-a-v1",
+      "policy_version_hash": "sha256:0cde8a6a6a6dee6f506470539af04fb3143bd749f1a25c4c56cb0f2b6f5442ce",
+      "latency": {
+        "end_to_end_ms": 457,
+        "internal_ms": 2,
+        "external_network_ms": 455,
+        "budget_ms": 450
+      },
+      "tripwire": {
+        "cluster_alert": true,
+        "region": "ALEX",
+        "count": 3,
+        "txn_ids": [
+          "ev-swap_spike-1786908755",
+          "ev-trip_0-1786908763",
+          "ev-trip_1-1786908765"
+        ],
+        "note": "inline tripwire fired — AI agent investigating via tool belt"
+      },
+      "webhook_alert": {
+        "sent": true,
+        "ts": "19:32:46Z"
+      }
+    },
+    "wall_ms": 467
+  },
+  "trip_2": {
+    "request": {
+      "txn_id": "ev-trip_2-1786908767",
+      "msisdn": "+99999991000",
+      "amount": 52000,
+      "account_mean": 1000,
+      "beneficiary_first_seen_minutes": 3,
+      "attempts_last_hour": 1,
+      "declared_multi_sim": false,
+      "region_tag": "ALEX"
+    },
+    "response": {
+      "txn_id": "ev-trip_2-1786908767",
+      "decision": "DECLINE",
+      "band": "SIM_SWAP_INSTANT_PATTERN",
+      "weighted_risk": 0.0,
+      "total_risk": 0.0,
+      "reasons": [
+        {
+          "name": "SIM_SWAP",
+          "value": {
+            "swapped": true
+          },
+          "confidence": 0.9,
+          "risk": 40.0,
+          "fetched_at": "2026-08-16T19:32:47Z",
+          "source": "nokia_nac",
+          "operator": "SIM-OPERATOR-A",
+          "degradation": "CACHED_FALLBACK",
+          "latency_ms": 311
+        }
+      ],
+      "step_up": {
+        "allowed": [
+          "WEBAUTHN",
+          "IN_APP_BIOMETRIC"
+        ],
+        "prohibited": [
+          "SMS",
+          "VOICE"
+        ]
+      },
+      "policy_id": "bank-a-v1",
+      "policy_version_hash": "sha256:0cde8a6a6a6dee6f506470539af04fb3143bd749f1a25c4c56cb0f2b6f5442ce",
+      "latency": {
+        "end_to_end_ms": 312,
+        "internal_ms": 1,
+        "external_network_ms": 311,
+        "budget_ms": 450
+      },
+      "tripwire": {
+        "cluster_alert": false
+      },
+      "webhook_alert": {
+        "sent": true,
+        "ts": "19:32:47Z"
+      }
+    },
+    "wall_ms": 328
+  },
+  "tripwire_investigation": {
+    "investigation": [
+      {
+        "txn_id": "ev-swap_spike-1786908755",
+        "sim_swap": {
+          "msisdn_hash": "msisdn_97b5792ab62de281098c",
+          "swapped": true,
+          "operator": "SIM-OPERATOR-A",
+          "signal_confidence": 1.0
+        },
+        "device_status": {
+          "msisdn_hash": "msisdn_97b5792ab62de281098c",
+          "roaming": true,
+          "country": "HU",
+          "connectivity_hint": "2026-08-16T19:32:49.945035Z"
+        },
+        "ts": 1786908770.0979407
+      },
+      {
+        "txn_id": "ev-trip_0-1786908763",
+        "sim_swap": {
+          "msisdn_hash": "msisdn_97b5792ab62de281098c",
+          "swapped": true,
+          "operator": "SIM-OPERATOR-A",
+          "signal_confidence": 0.9
+        },
+        "device_status": {
+          "msisdn_hash": "msisdn_97b5792ab62de281098c",
+          "roaming": true,
+          "country": "HU",
+          "connectivity_hint": "2026-08-16T19:32:52.751436Z"
+        },
+        "ts": 1786908772.8459868
+      },
+      {
+        "txn_id": "ev-trip_1-1786908765",
+        "sim_swap": {
+          "msisdn_hash": "msisdn_97b5792ab62de281098c",
+          "swapped": true,
+          "operator": "SIM-OPERATOR-A",
+          "signal_confidence": 1.0
+        },
+        "device_status": {
+          "msisdn_hash": "msisdn_97b5792ab62de281098c",
+          "roaming": true,
+          "country": "HU",
+          "connectivity_hint": "2026-08-16T19:32:53.978874Z"
+        },
+        "ts": 1786908774.09621
+      }
+    ],
+    "analysis": {
+      "pattern_summary": "3 rapid declines sharing region tag ALEX.",
+      "recommendation": "Human review: consider raising SIM_SWAP_1H weight.",
+      "proposed_change": "SIM_SWAP_1H: 40 -> 45 (human approval required)"
+    }
+  },
+  "replay": {
+    "txn_id": "ev-swap_spike-1786908755",
+    "intercept_records": [
+      {
+        "seq": 2,
+        "txn_id": "ev-swap_spike-1786908755",
+        "msisdn_hash": "msisdn_3d26ff0a654596d4b187",
+        "decision": "DECLINE",
+        "band": "SIM_SWAP_INSTANT_PATTERN",
+        "weighted_risk": 0.0,
+        "policy_version_hash": "sha256:0cde8a6a6a6dee6f506470539af04fb3143bd749f1a25c4c56cb0f2b6f5442ce",
+        "signals_digest": "482625caa179aff0c49959d0e89aab52f77f8722d013fba12cdc730cda00aa9b",
+        "ts": "2026-08-16T19:32:35Z",
+        "prev_hash": "c0eb3053bf362b2286c69b95acb7c24d1db6e53332670b5fe0d7e4a17afba181",
+        "hash": "1400eb231f435caeedf25ebbef99c29dadeea4324730e64a2ec41697a20a72a6"
+      }
+    ],
+    "chain": {
+      "intercept": {
+        "intact": true,
+        "last_seq": 7
+      },
+      "agent": {
+        "intact": true,
+        "last_seq": 5
+      }
+    }
+  },
+  "copilot": {
+    "facts_keys": [
+      "seq",
+      "txn_id",
+      "msisdn_hash",
+      "decision",
+      "band",
+      "weighted_risk",
+      "policy_version_hash",
+      "signals_digest",
+      "ts",
+      "prev_hash",
+      "hash"
+    ],
+    "note": "Copilot answers from ledger projection + structured signals only — no PII, no free text."
+  },
+  "latency_summary": {
+    "end_to_end_ms": [
+      1168,
+      316,
+      716,
+      314
+    ],
+    "internal_ms": [
+      13,
+      3,
+      1,
+      1
+    ],
+    "note": "dual reporting: end-to-end includes sandbox RTT; internal excludes external network"
+  }
+}
