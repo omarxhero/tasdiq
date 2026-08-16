@@ -4,3 +4,6 @@ __pycache__/
 ledger_store/
 keys/*.key
 demo/cached_responses/*.local.*
+
+# runtime markers
+evidence/portal/ui_server.flag
