@@ -7,3 +7,19 @@ demo/cached_responses/*.local.*
 
 # runtime markers
 evidence/portal/ui_server.flag
+
+# portal expedition bulk dumps (JS bundles + HTML shells — not needed in git)
+evidence/portal/hubjs/
+evidence/portal/allhub.js
+evidence/portal/console_js.txt
+evidence/portal/portal_home.html
+evidence/portal/portal_console.html
+evidence/portal/portal_hub.html
+evidence/portal/mcp_docs.html
+evidence/portal/mcp_docs_real.html
+evidence/portal/mcp_docs_rsc.txt
+evidence/portal/console_rsc.txt
+evidence/portal/console_config.json
+evidence/portal/console_config_unescaped.txt
+evidence/portal/mcp_docs_full.txt
+evidence/portal/mcp_docs_rendered.txt

@@ -129,6 +129,44 @@ Deps: `pip install -r requirements.txt` (+ network-as-code installed).
   overlay — wait for timeline children instead.
 - git identity is repo-local: Tasdiq <tasdiq@local> (matches earlier commits).
 
+## 7.8 NOKIA PORTAL VERIFICATION 2.0 (2026-08-17 morning, fresh connect.sid)
+- Fresh session cookie (user-provided) VERIFIED live at
+  POST https://networkascode.nokia.io/gateway/access-control → 200 with full access
+  tree (org ctx 20957 / team 20956, roles incl VIEW_APP_KEY, MANAGE_APPS).
+- /gateway/graphql accepts session (GraphQL validation errors ≠ auth errors) BUT
+  account-scoped queries (getActiveUserContext, NAC app registrations) → 403 from
+  internal http://api-gateway/graphql. Cause: the SPA adds context/role propagation
+  headers (x-rapid-role / rapidapi-context cookie) that curl can't replicate.
+  Not worth more time — account data isn't needed for the demo.
+- Full query/fragment map extracted from hub JS bundles → gql_queries.txt (99
+  fragments, 228 operations; interesting: getNacApplicationRegistrationsByOrganizationId,
+  getNacApplicationCsps, getUsagesForSubscription).
+- **NOKIA MCP SERVER IS LIVE**: POST https://mcp.prodeu.apihub.nokia.io with
+  x-rapidapi-key → initialize handshake 200 (RapidAPI MCP Server v0.1.0, protocol
+  2024-11-05). tools/list needs a per-API slug URL (config snippet lives behind the
+  logged-in API Playground "MCP Playground" button) — Phase 1 curiosity only.
+- MCP docs FULLY captured → evidence/portal/mcp_docs_content.txt. Key facts:
+  MCP "Security & Verification" tools = SIM-swap detect, silent number verification,
+  device-swap history, call-forwarding status. Nokia's own guidance: API-key auth,
+  "never use with production data", prompt-injection warnings, "internal developer
+  tool only" — mirrors our sealed tool belt design (Q&A gold).
+- Docs sidebar = full official API catalog: QoD, Location Verify/Retrieve, Geofencing,
+  Specialized Networks, Device Roaming Status, Device Reachability Status, Congestion
+  Insights, SIM Swap, Number Verification, Call Forwarding Signal, Device Swap,
+  KYC Match / Age Verification / Tenure / Fill-in (roadmap/Q&A ammo).
+- Docs trick: /docs/<slug> is a hub wrapper; real content is at
+  /_docs/<slug>?chat_bot=true&pub_hub=true (server-rendered, curl-able).
+- Session cookies were scrubbed from all evidence scripts before commit.
+
+## 7.9 HACKEREARTH PAGE RE-VERIFIED (2026-08-17)
+- Full rules captured live via in-app browser → evidence/portal/hackerearth_rules_verified.txt
+- VERDICT: Tasdiq conforms; no changes needed. Highlights: theme 4's suggested APIs are
+  literally "SIM Swap, Number Verification, Device Status" (our exact inline rail);
+  solo teams OK; IP stays with team; simulator numbers explicitly encouraged;
+  number-recycling NOT in official list (stays bonus-only). 1299 teams registered.
+- Phase-1 judged on Idea Capture Template + Pitch Deck (Relevance/Impact/Innovation/
+  Complexity). Phase-2 live demo adds "Agentic AI & Multi-API Orchestration" criterion.
+
 ## 8. GIT STATE
 Local repo initialized at handoff time (see `git log`). Working tree = state
 described in §2. Branch: main.

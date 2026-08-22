@@ -1,0 +1,73 @@
+MENA IGNITE HACKATHATHON — OFFICIAL PAGE VERIFIED (fetched live 2026-08-17 via in-app browser)
+Source: https://www.hackerearth.com/community/challenges/hackathon/mena-ignite-hackathon/
+Host: GSMA. 1.7K+ registrations, 1299 teams listed at time of check.
+
+DATES
+- Idea Phase:    Jul 1 – Aug 23, 2026 (times shown 3:30 PM – 9:29 PM · Asia/Beirut)
+- Prototype:     Aug 28 – Sep 13, 2026
+- Rules text: starts Jul 01 2026 06:00 PM IST, ends Sep 13 2026 11:59 PM IST
+- Winners showcase at MWC Doha, November 2026
+
+ELIGIBILITY
+- 18+ at registration. Individuals and teams, max 5 members (solo OK).
+- Open to residents of Arab League member countries and Türkiye (admin confirmed in
+  Discussion: yes, Arab League only). No qualification/experience requirements.
+
+THEME 4 (ours): "Secure Fintech, Payments & Anti-Fraud Innovation"
+- Suggested APIs on the official page: "SIM Swap, Number Verification, Device Status"
+  → EXACTLY the 3 APIs Tasdiq uses inline. Our pick = the theme's own suggested set.
+
+MANDATORY REQUIREMENTS (all submissions)
+1. Use >= 1 CAMARA API on Nokia NaC. Official list on page: QoS on Demand, Device Status,
+   Location Verification, Location Retrieval, Geofencing, Device/Application Attachment,
+   Network Slicing, Congestion Insights, SIM Swap, Number Verification.
+   → Tasdiq: SIM Swap + Number Verification + Device Status (3 of the listed set).
+2. AI agent layer that ORCHESTRATES CAMARA APIs as trusted real-time data sources
+   (not user-triggered actions); makes intelligent decisions, automates workflows,
+   assistant/copilot experiences. MUST be built ONLY with tools in the Resource &
+   Tooling Guide: https://uc.hackerearth.com/he-public-ap-south-1/GSMA%20MENA%20Resource%20Guidea254feb.pdf
+   → Tasdiq: deterministic engine decides in-line; Gemini agent (guide-listed) explains,
+     clusters, investigates via sealed tool belt. No non-guide tools.
+3. Original code, real-world problem, one of the 7 themes.
+
+GOOD-TO-HAVE (we hit all)
+- Multiple CAMARA APIs (3 inline + number-recycling as bonus investigation-only signal)
+- Intelligent orchestration across multiple network APIs
+- Scalable, secure, production-ready design (zero-trust: signed policies, dual ledger,
+  circuit breakers, sealed tool belt, prompt-injection canary)
+
+RESTRICTIONS
+- >=1 network API on NaC; original code; one of 7 themes; AI agent layer per guide only.
+
+PHASE 1 EVALUATION (Idea Capture Template + Pitch Deck)
+- Relevance: theme alignment; regional/local context
+- Impact: MENA-scale potential; business model / socio-economic value; planning effort
+- Innovation: originality; creative approach; regional pain points
+- Complexity & Implementation: technical depth; clear design; effective CAMARA API use;
+  feasible architecture; AI agent design per approved guide
+
+PHASE 2 EVALUATION (live demo, shortlisted)
+- Innovation & Originality; Impact; Scalability & Commercial Viability;
+  Technical Feasibility & Open Gateway API Usage (quality+depth of CAMARA integration,
+  functionality/stability, smooth end-to-end UX);
+  Agentic AI & Multi-API Orchestration; Presentation & Pitch
+
+RULES
+- Team max 5; online; submit multiple times (last counts); copied ideas disqualified;
+  "developed entirely during the Hackathon duration"; open-source libs allowed;
+  IP belongs to the team; HackerEarth ToS applies.
+
+NIKIA NaC SECTION NOTES
+- Self-register at networkascode.nokia.io (open access); developer portal also at
+  developer.networkascode.nokia.io; simulator numbers encouraged ("avoid complexity of
+  fake African SIM cards"); no org setup needed (individual registration).
+- API catalog listed under 4 families (Digital identity & anti-fraud: Number
+  verification, Sim Swap, Device Swap, Location verification; Network intelligence:
+  Congestion insights; Device intelligence: Location retrieval, Geofencing, Device
+  reachability, Device roaming; Programmable connectivity: QoD, Network slicing x3).
+  NOTE: Number Recycling is NOT in the hackathon's official API list → keep it as
+  bonus tool-belt investigation signal only, never a core submitted claim. (Already so.)
+
+COMPLIANCE VERDICT: Tasdiq materials conform. No changes required to deck/portal text
+from this re-verification. Submission deadline discipline: paste portal live fields +
+PPTX before Aug 23 (Beirut).
