@@ -1,35 +1,43 @@
 {
+  "n_cases": 200,
+  "composition": {
+    "sim_swap_takeover": 70,
+    "snatch_and_run": 70,
+    "clean": 60
+  },
+  "seed": 2026,
   "results": [
     {
       "arm": "bank_only",
-      "TP": 10,
-      "FN": 10,
+      "TP": 70,
+      "FN": 70,
       "FP": 0,
-      "TN": 10,
+      "TN": 60,
       "precision": 1.0,
       "recall": 0.5,
       "f1": 0.67
     },
     {
       "arm": "telecom_only",
-      "TP": 10,
-      "FN": 10,
+      "TP": 70,
+      "FN": 70,
       "FP": 0,
-      "TN": 10,
+      "TN": 60,
       "precision": 1.0,
       "recall": 0.5,
       "f1": 0.67
     },
     {
       "arm": "full_blend",
-      "TP": 20,
+      "TP": 140,
       "FN": 0,
       "FP": 0,
-      "TN": 10,
+      "TN": 60,
       "precision": 1.0,
       "recall": 1.0,
       "f1": 1.0
     }
   ],
-  "note": "Synthetic validation framework (~30 cases). Partner-operator data = Phase 1. Labeled as validation, not production evidence."
+  "incremental_recall_telecom": 0.5,
+  "note": "Synthetic validation framework (200 seeded, feature-varied cases: jittered amounts, payee ages, velocities, degraded-signal variants, tricky-but-legitimate cleans). Partner-operator data = Phase 1. Labeled as validation, not production evidence."
 }

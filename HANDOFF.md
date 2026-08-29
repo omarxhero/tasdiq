@@ -167,6 +167,24 @@ Deps: `pip install -r requirements.txt` (+ network-as-code installed).
 - Phase-1 judged on Idea Capture Template + Pitch Deck (Relevance/Impact/Innovation/
   Complexity). Phase-2 live demo adds "Agentic AI & Multi-API Orchestration" criterion.
 
+## 7.10 GAP-FIX SPRINT (2026-08-23) — professor review + hardening
+- ENGINE FIX (real bug, found by scaled ablation): weighting.py rule 0 fired
+  only at SIM_SWAP confidence == 1.0 — cached-fallback swaps (conf 0.9) escaped
+  the SIM_SWAP_RECENT band entirely. Now >= 0.9. Tests stayed 13/13.
+- Ablation scaled 30 → 200 seeded, feature-varied cases (ablation/run.py):
+  70 ATO + 70 snatch-&-run + 60 tricky-clean; 200/200 unique feature vectors.
+  Results: bank-only 0.50 / telecom-only 0.50 / blend 1.00 recall, +0.50
+  incremental, 0 FP. Headline number unchanged; evidence much stronger.
+  GOTCHA: Behavioral field is beneficiary_first_seen_minutes (not payee_age_min).
+- PaySim external anchor: GitHub mirrors are fraud-free sub-samples — parked as
+  user-side Kaggle download (ablation/external/README.md has the 2-min path).
+- demo/DEMO_SCRIPT.md: full <=3-min video shot list + beat-by-beat button map +
+  mock-judging Q&A (7 questions incl. 450ms derivation + money flow).
+- Deck v2.9 (13 slides): prototype-preview slide with 2 demo screenshots;
+  450ms justification (slide 5); money-flow line (slide 12); team of two with
+  LinkedIn; ablation numbers updated. build_pptx.py is canonical — kept in sync.
+- Portal txt: changelog v2.9 (items 41-46).
+
 ## 8. GIT STATE
 Local repo initialized at handoff time (see `git log`). Working tree = state
 described in §2. Branch: main.

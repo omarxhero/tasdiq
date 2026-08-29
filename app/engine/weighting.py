@@ -59,7 +59,7 @@ def evaluate(signals: list[Signal], b: Behavioral, policy: dict) -> dict:
 
     # Rule 0: live SIM swap is never a clean approve (band SIM_SWAP_RECENT)
     if telecom_swap_live := (sim is not None and isinstance(sim.value, dict)
-                             and sim.value.get("swapped") and sim.confidence == 1.0):
+                             and sim.value.get("swapped") and sim.confidence >= 0.9):
         if total >= policy.get("decline_gte", 80):
             return _out("DECLINE", "SIM_SWAP_HIGH_RISK", wr, total, reasons, [], [])
         return _out("ESCALATE", "SIM_SWAP_RECENT", wr, total, reasons,
