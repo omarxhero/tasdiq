@@ -214,7 +214,7 @@ Deps: `pip install -r requirements.txt` (+ network-as-code installed).
 1. FALSE-POSITIVE SCOPE: Device Swap carries risk 20 ONLY — far below escalate
    (55). It can never escalate alone; it corroborates SIM Swap / behavioral.
    Legitimate triggers (user buys a new phone) are absorbed by weighting, never
-   declined outright. NOTE: friend's proposed cross-check ("Device Status IMEI
+   declined outright. NOTE: an external review proposed a cross-check ("Device Status IMEI
    matched to bank-registered profile") references a nonexistent API capability —
    CAMARA Device Status = roaming/connectivity only; no bank IMEI registry exists.
 2. TIMEOUT BEHAVIOR: only device-swap:check is used (never the slow
