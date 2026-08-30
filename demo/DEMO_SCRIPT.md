@@ -59,4 +59,6 @@ never apologize for it.
 8. "450ms budget but observed latency is higher?" → "Two numbers: internal execution is single-digit ms; end-to-end includes the shared sandbox RTT (200–1,300ms). Production calls NaC from the bank's own VPC — sub-50ms RTT, well inside budget."
 9. "Synthetic cases = real fraud?" → "We don't claim that — they stress the engine's logic across the full feature space, reproducibly (seed 2026). The varied dataset caught a real engine bug. Partner data is Phase 1."
 10. "Device Swap false positives (eSIM toggles)?" → "Risk 20, corroboration-only — never escalates alone. A legitimate toggle costs at most a biometric step-up, never a decline."8. "Sovereignty?" → hosted models see synthetic demo data only; production runs
-   self-hosted open weights in the bank's cloud. No PII crosses a border.
+
+11. "Data residency with a hosted model?" → "Demo runs Gemini on synthetic data only. Production drops into a self-hosted sovereign instance — Llama 3.3 via vLLM on the bank's on-premise hardware. Same schemas, same sealed tool belt, nothing leaves the country."
+12. "What if STC or Zain has an API blackout?" → "A missing signal is a tightening, not an opening. Breakers trip, Tasdiq drops to signed degraded-mode fallback, high-value instant clearances lock, step-up collapses to biometric WebAuthn — until service returns."   self-hosted open weights in the bank's cloud. No PII crosses a border.

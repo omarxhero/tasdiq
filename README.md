@@ -89,7 +89,6 @@ sovereign deployments — hosted models see **synthetic demo data only**).
 | `POST /v1/replay` | Audit replay of any transaction from the ledger |
 | `GET /v1/metrics` | Engine metrics |
 | `GET /docs` | Machine-readable OpenAPI spec — banks can generate client SDKs from it (locked inter-service contracts are a Phase-1 workstream) |
-
 | `POST /v1/policy/verify` | Policy-bundle signature verification (tamper demo) |
 | `POST /v1/agent/explain` · `/report` · `/customer_alert` | Async AI outputs (schema-locked JSON) |
 | `POST /v1/agent/investigate` | **Agent-orchestrated CAMARA re-queries** for a tripwire cluster (sealed tool belt) |
@@ -117,12 +116,12 @@ the regional operator core — public-internet BGP routing would waste the 5G UR
 A missing signal is not an opening — it's a tightening. Confidence drops to 0, the
 coverage/primary-loss rules escalate, step-up collapses to biometric-only, and
 high-value instant clearance locks until signals return. Attackers who force a
-degraded state force a stricter bank, not a blinder one. And in the async lane the agent may skip a probe only when
-Behavioral floor: ≥2 transactions for the same account within one hour
-forces a full sweep — no skips allowed (attack windows look like busy accounts).
-independent corroboration makes it mathematically redundant (e.g. Device Swap
-already confirmed in a prior pass + inline SIM Swap ≥ 0.9); the inline rail
-always calls all 4 — skips happen only after the bank has its decision.
+degraded state force a stricter bank, not a blinder one. Behavioral floor: ≥2 transactions for the same account within one hour forces
+a full sweep — no skips allowed (attack windows look like busy accounts). In
+the async lane the agent may skip a probe only when independent corroboration
+makes it mathematically redundant (e.g. Device Swap already confirmed in a
+prior pass + inline SIM Swap ≥ 0.9); the inline rail always calls all 4 —
+skips happen only after the bank has its decision.
 
 `known_facts` are populated only from CAMARA API responses recorded in prior
 probes (Agent Ledger) — never from LLM-generated text. The agent cannot
