@@ -95,6 +95,10 @@ pre{background:var(--navy9); color:#CFE3FF; padding:12px; border-radius:9px; fon
 .opsbtns button{padding:9px; border-radius:8px; border:1px solid var(--line); background:#fff; cursor:pointer; font-size:12px; font-weight:600}
 .opsbtns button:hover{border-color:var(--navy6)}
 .empty{color:var(--mut); text-align:center; padding:40px 10px; font-size:13px}
+.probe{background:#fff;border:1px solid #D9E1EC;border-radius:8px;padding:8px 12px;margin:8px 0}
+.ptxn{font-size:11px;color:#5A6A83;margin-bottom:4px;font-weight:600}
+.prow{display:flex;align-items:center;gap:8px;font-size:12px;padding:3px 0;flex-wrap:wrap}
+.papi{font-family:'Courier New',monospace;font-size:11px;background:#EDF1F7;padding:2px 8px;border-radius:4px;color:#0F233F;font-weight:700}
 </style>
 </head>
 <body>
@@ -225,7 +229,7 @@ const SCEN = {
   dualsim:    {emoji:"📱", title:"Dual-SIM user", amount:6000, mean:400, payee:2, tries:1, dual:true, msisdn:"+99999991001", region:"GIZA", why:"Moderate amount to a new payee — device has two SIMs", age:"2 minutes ago"},
   snatch:     {emoji:"🏃", title:"Snatch & run", amount:18000, mean:400, payee:1, tries:6, dual:false, msisdn:"+99999991001", region:"CAIRO", why:"Phone was snatched unlocked — telecom looks normal, behavior doesn't", age:"1 minute ago"},
 };
-let current = "clean", lastTxn = null, lastDecision = null;
+let current = "clean", lastTxn = null, lastDecision = null, recentTxns = [];
 const $ = id => document.getElementById(id);
 document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
   document.querySelectorAll("nav button").forEach(x => x.classList.remove("on"));
@@ -253,6 +257,7 @@ async function pay(){
       account_mean:s.mean, beneficiary_first_seen_minutes:s.payee, attempts_last_hour:s.tries,
       declared_multi_sim:s.dual, region_tag:s.region, memo:""});
     lastTxn = j.txn_id; lastDecision = j;
+    recentTxns.push(j.txn_id); if(recentTxns.length > 5) recentTxns.shift();
     clearInterval(stepTimer);
     renderCustomer(j, s); renderOps(j); renderTimeline(j);
   }catch(e){ clearInterval(stepTimer); showRes("⚠️","Connection issue", String(e), {}); }
@@ -391,12 +396,30 @@ async function replayTxn(){
     <pre>${JSON.stringify(j.intercept_records[0],null,2)}</pre>`);
 }
 async function investigate(){
-  const cl = {cluster_alert:true, count:3, region:"ALEX", txn_ids:[lastTxn]};
+  const ids = recentTxns.length ? recentTxns.slice(-3) : [lastTxn];
+  const cl = {cluster_alert:true, count:ids.length, region:SCEN[current].region, txn_ids:ids};
   const j = await api("/v1/agent/investigate", cl);
-  copilot(`<div class="aibox"><h4>🔎 Tool-belt investigation (agent-orchestrated CAMARA re-queries)</h4>
-    The agent autonomously re-checked SIM swap, device status and <b>number recycling</b> for the cohort.
-    It saw structured facts only — no phone numbers, no memos (PII-sealed tools).</div>
-    <pre>${JSON.stringify(j,null,2).slice(0,1800)}</pre>`);
+  const probes = (j.investigation||[]).map(p => {
+    if(p.error) return `<div class="probe"><b>${p.txn_id?.slice(0,20)}…</b> <span class="chip no">not found</span></div>`;
+    const sw = p.sim_swap||{}, ds = p.device_status||{}, nr = p.number_recycling||{};
+    return `<div class="probe">
+      <div class="ptxn">txn ${p.txn_id.slice(0,22)}… · operator ${sw.operator||"—"}</div>
+      <div class="prow"><span class="papi">CAMARA · SIM Swap</span> ${sw.swapped ? '<span class="chip no">SWAPPED</span>' : '<span class="chip ok">no swap</span>'} <span class="muted">conf ${sw.signal_confidence ?? "—"}</span></div>
+      <div class="prow"><span class="papi">CAMARA · Device Status</span> ${ds.roaming ? '<span class="chip" style="background:#FDF7F2;color:#B45309">roaming '+(ds.country||"")+'</span>' : '<span class="chip ok">home network</span>'}</div>
+      <div class="prow"><span class="papi">CAMARA · Number Recycling</span> ${nr.phoneNumberRecycled === true ? '<span class="chip no">RECYCLED — takeover vector</span>' : nr.phoneNumberRecycled === false ? '<span class="chip ok">not recycled</span>' : '<span class="chip">unavailable</span>'}</div>
+    </div>`;
+  }).join("");
+  const a = j.analysis||{};
+  copilot(`<div class="aibox">
+    <h4>🤖 AI agent — autonomous CAMARA orchestration (sealed tool belt)</h4>
+    <div class="sub">The agent re-queried the network for the cohort by itself — read-only, structured facts only.
+    No phone numbers and no memos ever entered the model context.</div>
+    ${probes}
+    <div class="probe" style="margin-top:10px">
+      <div class="prow"><span class="papi">🧠 Agent analysis</span> ${a.pattern_summary||"—"}</div>
+      <div class="prow"><span class="papi">⚖️ Recommendation</span> ${a.recommendation||"—"} <span class="muted">(${a.proposed_change||"—"} · human approval required)</span></div>
+      <div class="prow"><span class="papi">⛓ Audit</span> <span class="chip ok">every tool call logged to the Agent Ledger</span></div>
+    </div></div>`);
 }
 function copilot(html){ $("copilotOut").innerHTML = html; }
 </script>
