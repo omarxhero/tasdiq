@@ -123,6 +123,21 @@ coercion-style anomalies — no single signal covers them all.
 
 ## Demo UI (two views)
 
+## Proof the AI works (live capture)
+
+The async agent doesn't just "use AI" as a label — the repo contains captured
+evidence of it orchestrating network APIs by itself:
+
+- **Agent-decision lines** — each investigation card opens with the policy's
+  decision in plain language: *"first forensic pass — full sweep"* on the first
+  pass, then *"device re-registration already confirmed in prior pass; recycling
+  status already on record (ran 2/4)"* when re-running is mathematically redundant.
+- **Per-API result chips** — every CAMARA call the agent makes is shown with its
+  live answer: SIM Swap `SWAPPED` · Device Status `roaming HU` · Device Swap
+  `NEW DEVICE` · Number Recycling `RECYCLED — takeover vector`.
+- **Raw captures:** `evidence/live_calls/four_signal_live_decision.json` (all four
+  signals live through the pipeline) and `evidence/portal/ui_policy_pass2_selective.png`.
+
 | 📱 Customer | 🖥 Fraud Ops |
 |---|---|
 | Phone mockup ("Nile Bank — InstaPay"), 5 scenario chips, bilingual AR/EN results, Face-ID step-up ("no SMS was ever sent") | Decision badge + band, confidence bars, step-up chips (SMS ✗ crossed on swap bands), dual latency, tripwire → **AI panel showing each of the agent's 4 CAMARA calls**, tamper + canary buttons, audit chain |
