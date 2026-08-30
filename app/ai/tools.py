@@ -123,6 +123,36 @@ class ToolBelt:
         """Last recorded probe facts for this txn ({} if never probed)."""
         return self._probe_facts.get(txn_id, {})
 
+    def recent_txn_pressure(self, msisdn_hash: str, window_s: int = 3600) -> int:
+        """How many intercept records this account has in the last window.
+        High velocity = attack window -> the policy must not skip anything."""
+        import time as _t
+        n = 0
+        now = _t.time()
+        try:
+            for line in self.ledger.intercept_path.read_text().splitlines():
+                r = json.loads(line)
+                if r.get("msisdn_hash") != msisdn_hash:
+                    continue
+                try:
+                    ts = _t.mktime(_t.strptime(r["ts"], "%Y-%m-%dT%H:%M:%SZ"))
+                except Exception:
+                    continue
+                if now - ts <= window_s:
+                    n += 1
+        except Exception:
+            return 999          # can't read history -> assume pressure, full sweep
+        return n
+
+    def audit_skip(self, txn_id: str, skipped: list, facts_source: str):
+        """Skip ≠ silence: skipped probes are ledger-recorded with the cached
+        facts that justified them (audit completeness, non-repudiation)."""
+        payload = {"skipped": skipped, "facts_source": facts_source,
+                   "cached_facts": self._probe_facts.get(txn_id, {})}
+        self.ledger.append_agent(txn_id, "probes_skipped_by_policy",
+                                 hashlib.sha256(json.dumps(payload, sort_keys=True).encode()).hexdigest())
+        self.log(f"[TOOLBELT][policy] txn={txn_id} skipped={skipped} (facts from {facts_source})")
+
     def ledger_projection(self, txn_id: str) -> dict:
         """Memo-free projection: structured decision record only (no free text)."""
         recs = self.ledger.replay(txn_id)

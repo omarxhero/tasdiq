@@ -110,18 +110,31 @@ class TasdiqAgent:
             sim_confirmed = bool(sim and sim.get("confidence", 0) >= 0.9
                                  and isinstance(sim.get("value"), dict)
                                  and sim["value"].get("swapped"))
-            # redundancy skip: DEVICE_SWAP already re-confirmed in a prior pass
-            if prev_ds is True and sim_confirmed:
-                probes.remove("DEVICE_SWAP")
-                skipped.append("DEVICE_SWAP")
-                why_parts.append("device re-registration already confirmed in prior pass")
-            # redundancy skip: NUMBER_RECYCLING already answered
-            if prev_nr is not None:
-                probes.remove("NUMBER_RECYCLING")
-                skipped.append("NUMBER_RECYCLING")
-                why_parts.append("recycling status already on record")
+            # BEHAVIORAL FLOOR: any account pressure in the last hour -> no skips.
+            # Attack windows look exactly like busy accounts; busy accounts get
+            # the full forensic sweep. Skips are a quiet-period optimization.
+            pressure = self.tools.recent_txn_pressure(
+                (recs[0].get("msisdn_hash") if recs else "") or "") if self.tools else 999
+            if pressure < 2:
+                # redundancy skip: DEVICE_SWAP already re-confirmed in a prior pass
+                # + independently corroborated by the inline rail (two sources)
+                if prev_ds is True and sim_confirmed:
+                    probes.remove("DEVICE_SWAP")
+                    skipped.append("DEVICE_SWAP")
+                    why_parts.append("device re-registration already confirmed in prior pass")
+                # redundancy skip: NUMBER_RECYCLING already answered (static fact)
+                if prev_nr is not None:
+                    probes.remove("NUMBER_RECYCLING")
+                    skipped.append("NUMBER_RECYCLING")
+                    why_parts.append("recycling status already on record")
+            elif skipped or probes != list(self.ALL_PROBES):
+                probes, skipped, why_parts = list(self.ALL_PROBES), [], []
+                why_parts.append("account pressure in window — full sweep forced")
             sel[txn_id] = {"probes": probes, "skipped": skipped,
                            "why": "; ".join(why_parts) if why_parts else ""}
+            if skipped and self.tools:
+                self.tools.audit_skip(txn_id, skipped,
+                                      facts_source="prior-pass probe facts + inline signals")
         return sel
 
     def _render_reasons(self, cluster: dict, sel: dict) -> dict:

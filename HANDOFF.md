@@ -256,6 +256,26 @@ Deps: `pip install -r requirements.txt` (+ network-as-code installed).
   natural-language explanation of why the policy skipped a probe. The policy
   is code, not the model."
 
+## 7.15 EXTERNAL REVIEW ROUND-2 (behavioral floor + containment framing)
+- BEHAVIORAL FLOOR in _proportionate_selection: any account pressure (>=2
+  intercept records for the same msisdn_hash within 1h) -> skips disabled,
+  full sweep forced. Quiet accounts only. tools.recent_txn_pressure() scans
+  the intercept ledger by msisdn_hash; unreadable history -> 999 (fail-safe).
+- SKIP != SILENCE: tools.audit_skip() writes an agent-ledger entry with the
+  skipped probes + the cached facts that justified them (non-repudiation).
+- README: column -> "Fail-safe hardening when the signal is unavailable";
+  containment paragraph (missing signal = tighten: conf 0, escalate,
+  biometric-only, high-value clearance locks); Device Swap row strengthened
+  with the simultaneous-swap pattern (SIM+device changed >24h apart -> SIM
+  Swap window reads old, only Device Swap flags it); deployment-topology note
+  (enterprise API gateway + mTLS + IP allowlist in production).
+- Guidebook: ASCII firewall diagram (two ledgers, no write path) in Part 7.
+- Tests 17 -> 19: pressure-forces-full-sweep + audits skips; hostile memo
+  cannot influence skip decision (memo never enters policy inputs).
+- Already-safe (no action): LLM parse failure (strict_json try/except +
+  template fallback, _proportionate_selection is pure code); /docs polish
+  (route summaries added).
+
 ## 8. GIT STATE
 Local repo initialized at handoff time (see `git log`). Working tree = state
 described in §2. Branch: main.

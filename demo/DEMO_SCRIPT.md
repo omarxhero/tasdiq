@@ -32,6 +32,9 @@ never apologize for it.
 - [ ] Window 1600×900, no notifications, phone-mock visible fully
 - [ ] Say "live" only when the LIVE badge shows; if CACHED_FALLBACK, say
       "labeled cached fallback — the breaker opened, decision still in-window"
+- [ ] Demo-day reasoning note: the policy line is deterministic (template
+      fallback if Gemini misbehaves live) — rehearse once with keys OFF so the
+      fallback wording feels native, not like a failure
 - [ ] End card: team (Omar Chehade · Mohamad Nour Sayour) + repo link
 
 ## Mock-judging checklist (run with Dr. or a peer as judge)

@@ -12,7 +12,7 @@ model) for bilingual compliance drafting and investigations.
 > the engine decides every transaction inline (450ms budget: two 200ms signal phases +
 > 50ms margin); the AI never decides — it explains, investigates, and drafts paperwork.
 
-![Tests](https://img.shields.io/badge/tests-17%2F17-green) ![CAMARA](https://img.shields.io/badge/CAMARA-4%20APIs%20live-blue) ![Ablation](https://img.shields.io/badge/ablation-%2B0.50%20recall-orange)
+![Tests](https://img.shields.io/badge/tests-19%2F19-green) ![CAMARA](https://img.shields.io/badge/CAMARA-4%20APIs%20live-blue) ![Ablation](https://img.shields.io/badge/ablation-%2B0.50%20recall-orange)
 
 ---
 
@@ -62,7 +62,7 @@ bank ──► /v1/decide ──► [L1 CAMARA: SIM-Swap ▸ Number-Verify ▸ D
 ```bash
 pip install -r requirements.txt
 cp .env.example .env            # add your keys (see below)
-python -m pytest tests/ -q      # 17 tests — engine rules, tamper rejection, canary, proportionality policy
+python -m pytest tests/ -q      # 19 tests — engine rules, tamper rejection, canary, proportionality policy
 python demo/run_demo.py         # live end-to-end evidence run → evidence/
 python ablation/run.py          # 200-case ablation study
 python -m uvicorn app.main:app --port 8793
@@ -84,6 +84,11 @@ sovereign deployments — hosted models see **synthetic demo data only**).
 | `POST /v1/replay` | Audit replay of any transaction from the ledger |
 | `GET /v1/metrics` | Engine metrics |
 | `GET /docs` | Machine-readable OpenAPI spec — banks can generate client SDKs from it (locked inter-service contracts are a Phase-1 workstream) |
+
+> **Deployment topology:** the prototype serves `/docs` openly for evaluation. Production
+deployment requires these endpoints behind an enterprise API gateway (Kong/Apigee-class)
+enforcing mutual TLS, bank↔Tasdiq IP allow-listing, and payload signature verification —
+the raw FastAPI surface is never internet-facing.
 | `POST /v1/policy/verify` | Policy-bundle signature verification (tamper demo) |
 | `POST /v1/agent/explain` · `/report` · `/customer_alert` | Async AI outputs (schema-locked JSON) |
 | `POST /v1/agent/investigate` | **Agent-orchestrated CAMARA re-queries** for a tripwire cluster (sealed tool belt) |
@@ -92,16 +97,17 @@ sovereign deployments — hosted models see **synthetic demo data only**).
 
 ## Why each CAMARA API earns its place
 
-| API | The question it answers | System behavior without it (degraded state) |
+| API | The question it answers | Fail-safe hardening when the signal is unavailable |
 |---|---|---|
 | **SIM Swap** | Did this number move to a new SIM? | Rule-0 early exit never fires; the case still routes through Phase 2 + behavioral scoring — but you lose the instant decline and the SMS-prohibition UX |
-| **Device Swap** | Did the number move to a different *device*? | Re-registration without a SIM change is caught only by behavioral scoring — narrower net |
+| **Device Swap** | Did the number move to a different *device*? | Catches the simultaneous-swap attack: SIM *and* device changed >24h apart — by payment time SIM Swap reads "old" (outside its window) and only Device Swap still flags the change |
 | **Number Verification** | Does the number match the paying device? | Silent possession check unavailable — every payment falls back to OTP step-up |
 | **Device Status** | Roaming / country / connectivity? | Context loss: a roaming regular traveler scores closer to a takeover case |
 
-Degraded state ≠ open gap: any missing signal drops to confidence 0 and the
-coverage/primary-loss rules escalate conservatively — the system tightens, never
-silently approves. And in the async lane the agent may skip a probe only when
+A missing signal is not an opening — it's a tightening. Confidence drops to 0, the
+coverage/primary-loss rules escalate, step-up collapses to biometric-only, and
+high-value instant clearance locks until signals return. Attackers who force a
+degraded state force a stricter bank, not a blinder one. And in the async lane the agent may skip a probe only when
 independent corroboration makes it mathematically redundant (e.g. Device Swap
 already confirmed in a prior pass + inline SIM Swap ≥ 0.9); the inline rail
 always calls all 4 — skips happen only after the bank has its decision.
@@ -137,7 +143,7 @@ Scenarios: normal payment · **SIM-swap attack** (early-exit decline) · recent 
   (0.9) escaped the band — fixed to ≥ 0.9.*
 - **Latency:** dual-reported — end-to-end (incl. Nokia sandbox RTT) vs internal
   execution. The sandbox is shared dev infrastructure; we show its overhead, not hide it.
-- **Tests:** 17/17 — rule ordering, early exit, Ed25519 tamper rejection, injection,
+- **Tests:** 19/19 — rule ordering, early exit, Ed25519 tamper rejection, injection,
   canary, breaker behavior, ledger chains, pseudonymization.
 - **Evidence:** `evidence/live_calls/` (first live CAMARA call), `evidence/demo_run/`
   (full live run), `evidence/ablation_results.json`, `evidence/portal/` (UI
