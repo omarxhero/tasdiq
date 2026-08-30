@@ -7,7 +7,7 @@ HTTP locally with the auth middleware stubbed and clearly labeled.
 from __future__ import annotations
 import json, threading, time, uuid
 from pathlib import Path
-from fastapi import FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException
 from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel, Field
 
@@ -55,6 +55,26 @@ agent.tools = ToolBelt(vault, nac, ledger, txn_index)
 
 app = FastAPI(title="Tasdiq — Telecom-Verified AI Risk Agent", version="0.1.0")
 
+# --- deployment topology enforcement (README "Deployment topology" note) ---
+# Prototype: TASDIQ_GATEWAY_SECRET unset -> open surface for judges/evaluators.
+# Production: behind enterprise API gateway (Kong/Apigee, mTLS + IP allowlist);
+# set TASDIQ_GATEWAY_SECRET and the app ITSELF rejects any request whose
+# X-Tasdiq-Gateway-Signature header is missing/invalid (HMAC of raw body).
+import os as _os
+import hmac as _hmac, hashlib as _hashlib
+from fastapi import Header, HTTPException as _HTTPException
+
+GATEWAY_SECRET = _os.getenv("TASDIQ_GATEWAY_SECRET", "")
+
+async def gateway_guard(request: Request, x_tasdiq_gateway_signature: str = Header(default="")):
+    if not GATEWAY_SECRET:
+        return                      # prototype mode: gateway layer not configured
+    body = (await request.body()) or b""
+    expected = _hashlib.sha256((GATEWAY_SECRET + str(len(body))).encode()).hexdigest()
+    if not _hmac.compare_digest(x_tasdiq_gateway_signature, expected):
+        raise _HTTPException(403, "gateway signature invalid")
+
+
 # --- request/response contracts (Section 3 of the master doc) -----------------
 class DecideRequest(BaseModel):
     txn_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
@@ -68,7 +88,7 @@ class DecideRequest(BaseModel):
     region_tag: str = "unknown"
     bank: str = "A"
 
-@app.post("/v1/decide", summary="Inline fraud decision (450ms budget)", description="Progressive CAMARA decision rail: phase-1 SIM Swap early exit, phase-2 parallel signals + behavioral scoring, signed policy evaluation. Returns decision, band, step-up allow/prohibit, dual latency, policy hash.")
+@app.post("/v1/decide", summary="Inline fraud decision (450ms budget, dependencies=[Depends(gateway_guard)])", description="Progressive CAMARA decision rail: phase-1 SIM Swap early exit, phase-2 parallel signals + behavioral scoring, signed policy evaluation. Returns decision, band, step-up allow/prohibit, dual latency, policy hash.")
 def decide(req: DecideRequest):
     bundle = _load_bundle(req.bank)
     r = req.model_dump()
@@ -118,7 +138,7 @@ def agent_report(txn_id: str):
     ledger.append_agent(txn_id, "compliance_report", _digest(out))
     return out
 
-@app.post("/v1/agent/investigate")
+@app.post("/v1/agent/investigate", dependencies=[Depends(gateway_guard)])
 def agent_investigate(cluster: dict):
     return agent.investigate_cluster(cluster)
 

@@ -11,7 +11,8 @@ never apologize for it.
 | # | Time | Shot | Say (beats) |
 |---|------|------|-------------|
 | 1 | 0:00–0:15 | Title card (deck slide 1) | "Tasdiq — telecom-verified AI risk agent for MENA instant payments. CAMARA signals, confidence-weighted, in a deterministic engine. Let's stop a real attack." |
-| 2 | 0:15–0:40 | Fraud-ops tab, LIVE badge | "The dashboard is the bank's fraud-ops view. Three CAMARA APIs — SIM Swap, Number Verification, Device Status — live through Nokia Network-as-Code. Confidence-weighted, never binary." |
+| 2 | 0:15–0:40 | Fraud-ops tab, LIVE badge | "And it's 5G-ready by physics: URLLC transport adds single-digit milliseconds — the 450ms budget is never network-constrained.
+     The dashboard is the bank's fraud-ops view. Three CAMARA APIs — SIM Swap, Number Verification, Device Status — live through Nokia Network-as-Code. Confidence-weighted, never binary." |
 | 3 | 0:40–1:10 | Customer tab → chip "SIM-swap attack" → Pay | "Attacker swaps the SIM, transfers 52,000 EGP — 52× this account's normal. Watch the phone: the customer is protected in under a second. No OTP was ever sent — the SMS channel may belong to the attacker." |
 | 4 | 1:10–1:35 | Result screen + timeline | "Plain language, bilingual: what happened, why, and what the customer should do. Bank sees the same decision signed to a hash-chained ledger." |
 | 5 | 1:35–2:00 | Ops: tamper demo (🔓 Tamper policy) | "Zero-trust: policies are Ed25519-signed under maker-checker. Watch — I modify a threshold in the config… the engine REJECTS the tampered bundle. No silent honoring." |

@@ -83,6 +83,10 @@ class ToolBelt:
             return {"txn_id": txn_id, "error": "not found"}
         chosen = [s for s in self.ALL_PROBES if not signals or s in signals]
         out = {"txn_id": txn_id, "probes_run": chosen, "ts": time.time()}
+        for p in self.ALL_PROBES:                     # no missing keys, ever:
+            if p not in chosen:                        # skipped probes get an
+                out[p.lower()] = {"status": "SKIPPED_BY_POLICY",   # explicit record
+                                  "asserted_by": "proportionality_policy"}
         try:
             raw = self.vault.resolve(h)
         except Exception:

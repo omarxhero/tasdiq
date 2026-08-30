@@ -8,6 +8,11 @@ Tasdiq (Arabic for *verification*) stops account-takeover fraud on instant payme
 inside a **deterministic decision engine**, with an async **AI agent layer** (guide-listed
 model) for bilingual compliance drafting and investigations.
 
+> **5G-ready:** the 450ms decision budget is a service-level target independent of the
+access network — 5G URLLC radio/core transport adds single-digit milliseconds, and the
+engine's internal execution is single-digit ms. Faster networks shrink headroom concerns,
+never the architecture.
+
 > **Core principle — deterministic security, generative compliance:**
 > the engine decides every transaction inline (450ms budget: two 200ms signal phases +
 > 50ms margin); the AI never decides — it explains, investigates, and drafts paperwork.
