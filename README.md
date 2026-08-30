@@ -4,7 +4,7 @@
 
 Tasdiq (Arabic for *verification*) stops account-takeover fraud on instant payment rails
 (InstaPay · Sarie · Aani · FAST) **before the money moves** — using GSMA Open Gateway
-**CAMARA APIs** via the **Nokia Network-as-Code** platform as confidence-weighted signals
+**CAMARA APIs** (SIM Swap, Number Verification, Device Status, Device Swap) via the **Nokia Network-as-Code** platform as confidence-weighted signals
 inside a **deterministic decision engine**, with an async **AI agent layer** (guide-listed
 model) for bilingual compliance drafting and investigations.
 
@@ -12,7 +12,7 @@ model) for bilingual compliance drafting and investigations.
 > the engine decides every transaction inline (450ms budget: two 200ms signal phases +
 > 50ms margin); the AI never decides — it explains, investigates, and drafts paperwork.
 
-![Tests](https://img.shields.io/badge/tests-13%2F13-green) ![CAMARA](https://img.shields.io/badge/CAMARA-3%20APIs%20live-blue) ![Ablation](https://img.shields.io/badge/ablation-%2B0.50%20recall-orange)
+![Tests](https://img.shields.io/badge/tests-13%2F13-green) ![CAMARA](https://img.shields.io/badge/CAMARA-4%20APIs%20live-blue) ![Ablation](https://img.shields.io/badge/ablation-%2B0.50%20recall-orange)
 
 ---
 
@@ -21,7 +21,7 @@ model) for bilingual compliance drafting and investigations.
 1. Bank calls `POST /v1/decide` with the transaction (amount, payee age, velocity).
 2. **Phase 1 (0–200ms):** SIM Swap check alone. Fresh swap + amount > multiplier×mean
    (per-bank, e.g. 40×) → **DECLINE immediately** (early exit).
-3. **Phase 2 (200–400ms):** Number Verification + Device Status **in parallel**, plus
+3. **Phase 2 (200–400ms):** Number Verification + Device Status + Device Swap **in parallel**, plus
    bank-side behavioral signals (payee recency, velocity, amount-vs-mean) — catches
    snatch-&-run theft where telecom signals stay green.
 4. Confidence-weighted scoring: `risk = Σ(riskᵢ × confᵢ) ÷ Σ confᵢ + behavioral points`,
@@ -47,7 +47,7 @@ model) for bilingual compliance drafting and investigations.
 | **L5** | Dual-ledger audit: Intercept (inline) + Agent (async), HMAC-pseudonymized MSISDNs, RFC 3161 anchor queue |
 
 ```
-bank ──► /v1/decide ──► [L1 CAMARA: SIM-Swap ▸ Number-Verify ▸ Device-Status]
+bank ──► /v1/decide ──► [L1 CAMARA: SIM-Swap ▸ Number-Verify ▸ Device-Status ▸ Device-Swap]
                          │  (Nokia NaC gateway, per-operator breakers)
                          ▼
               [L2 engine: rules 0–5 + confidence math] ──► decision + band + step-up
@@ -93,7 +93,7 @@ sovereign deployments — hosted models see **synthetic demo data only**).
 
 | 📱 Customer | 🖥 Fraud Ops |
 |---|---|
-| Phone mockup ("Nile Bank — InstaPay"), 5 scenario chips, bilingual AR/EN results, Face-ID step-up ("no SMS was ever sent") | Decision badge + band, confidence bars, step-up chips (SMS ✗ crossed on swap bands), dual latency, tripwire → **AI panel showing each CAMARA call the agent made**, tamper + canary buttons, audit chain |
+| Phone mockup ("Nile Bank — InstaPay"), 5 scenario chips, bilingual AR/EN results, Face-ID step-up ("no SMS was ever sent") | Decision badge + band, confidence bars, step-up chips (SMS ✗ crossed on swap bands), dual latency, tripwire → **AI panel showing each of the agent's 4 CAMARA calls**, tamper + canary buttons, audit chain |
 
 ### Screenshots (live demo)
 

@@ -78,15 +78,20 @@ class ToolBelt:
         if not h:
             return {"txn_id": txn_id, "error": "not found"}
         recyc = None
+        dswap = None
         try:
             raw = self.vault.resolve(h)
             if raw:
                 rr = self.nac.number_recycling(raw)
                 recyc = {"phoneNumberRecycled": (rr.value or {}).get("phoneNumberRecycled")}
+                dsv = self.nac.device_swap(raw, 3.0)
+                dswap = {"swapped": (dsv.value or {}).get("swapped")}
         except Exception:
             recyc = {"error": "unavailable"}
+            dswap = {"error": "unavailable"}
         out = {"txn_id": txn_id, "sim_swap": self._structured_swap(h),
                "device_status": self._structured_status(h),
+               "device_swap": dswap,
                "number_recycling": recyc, "ts": time.time()}
         self.log(f"[TOOLBELT][investigation] txn={txn_id} -> structured facts only")
         self.ledger.append_agent(txn_id, "toolbelt_investigation",

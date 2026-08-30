@@ -1,7 +1,7 @@
 """L2 progressive decision engine — deadline-driven, early-exit.
 
 Phase 1 (0–200ms budget): SIM Swap only; swap + amount > multiplier×mean -> DECLINE.
-Phase 2: parallel Number Verify + Device Status + behavioral signals.
+Phase 2: parallel Number Verify + Device Status + Device Swap + behavioral signals.
 Dual latency reporting: end_to_end_ms (incl. sandbox RTT) and internal_ms
 (external network excluded). Sandbox overhead shown, never hidden.
 """
@@ -38,13 +38,14 @@ class DecisionEngine:
         remaining = deadline - (time.perf_counter() - t0)
         nv = self.nac.number_verify(req["msisdn"], req.get("declared_multi_sim", False), remaining)
         roam = self.nac.roaming(req["msisdn"], remaining)
+        dswap = self.nac.device_swap(req["msisdn"], remaining)
         b = Behavioral(
             beneficiary_first_seen_minutes=req.get("beneficiary_first_seen_minutes", 9999),
             attempts_last_hour=req.get("attempts_last_hour", 0),
             amount_vs_mean=amount_vs_mean,
             declared_multi_sim=req.get("declared_multi_sim", False),
         )
-        result = evaluate([sim, nv, roam], b, policy)
+        result = evaluate([sim, nv, roam, dswap], b, policy)
         return self._finish(req, t0, result["decision"], result["band"], result["reasons"],
                             result["weighted_risk"], policy, bundle,
                             result["step_up"]["allowed"], result["step_up"]["prohibited"],

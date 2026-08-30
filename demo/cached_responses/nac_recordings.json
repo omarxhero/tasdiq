@@ -14,6 +14,10 @@
     },
     "connectivity": {
       "connectivityStatus": "CONNECTED_SMS"
+    },
+    "device_swap": {
+      "swapped": true,
+      "_live_verified": "2026-08-30"
     }
   },
   "+99999991001": {
@@ -30,6 +34,10 @@
     },
     "connectivity": {
       "connectivityStatus": "CONNECTED_DATA"
+    },
+    "device_swap": {
+      "swapped": false,
+      "_live_verified": "2026-08-30"
     }
   }
 }

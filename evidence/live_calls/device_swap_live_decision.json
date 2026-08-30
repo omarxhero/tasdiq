@@ -1,0 +1,47 @@
+{
+  "txn_id": "dswap-live-1",
+  "decision": "DECLINE",
+  "band": "SIM_SWAP_INSTANT_PATTERN",
+  "weighted_risk": 0.0,
+  "total_risk": 0.0,
+  "reasons": [
+    {
+      "name": "SIM_SWAP",
+      "value": {
+        "swapped": true
+      },
+      "confidence": 1.0,
+      "risk": 40.0,
+      "fetched_at": "2026-08-30T15:20:55Z",
+      "source": "nokia_nac",
+      "operator": "SIM-OPERATOR-A",
+      "degradation": null,
+      "latency_ms": 496
+    }
+  ],
+  "step_up": {
+    "allowed": [
+      "WEBAUTHN",
+      "IN_APP_BIOMETRIC"
+    ],
+    "prohibited": [
+      "SMS",
+      "VOICE"
+    ]
+  },
+  "policy_id": "bank-a-v1",
+  "policy_version_hash": "sha256:0cde8a6a6a6dee6f506470539af04fb3143bd749f1a25c4c56cb0f2b6f5442ce",
+  "latency": {
+    "end_to_end_ms": 507,
+    "internal_ms": 11,
+    "external_network_ms": 496,
+    "budget_ms": 450
+  },
+  "tripwire": {
+    "cluster_alert": false
+  },
+  "webhook_alert": {
+    "sent": true,
+    "ts": "15:20:56Z"
+  }
+}

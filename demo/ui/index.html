@@ -299,11 +299,12 @@ function renderTimeline(j){
   L.push(["AI writes the paperwork (seconds later)", `Explanation + bilingual regulator report — the AI never decides, it documents.`]);
   $("timeline").innerHTML = L.map((x,i) => `<div class="tl"><div class="tdot done">${i+1}</div><div><b>${x[0]}</b><div class="sub">${x[1]}</div></div></div>`).join("");
 }
-const sigName = {SIM_SWAP:"SIM Swap", NUMBER_VERIFY:"Number Verification", DEVICE_STATUS:"Device Status"};
+const sigName = {SIM_SWAP:"SIM Swap", NUMBER_VERIFY:"Number Verification", DEVICE_STATUS:"Device Status", DEVICE_SWAP:"Device Swap"};
 function sig(j,n){ const s=(j.reasons||[]).find(r=>r.name===n); return s?sigName[n]:"—"; }
 function cf(j,n){ const s=(j.reasons||[]).find(r=>r.name===n); return s?s.confidence.toFixed(2):"?"; }
 function fmtVal(j,n){ const s=(j.reasons||[]).find(r=>r.name===n); const v=s&&s.value;
   if(!v||typeof v!=="object") return v??s?.degradation??"?";
+  if(n==="DEVICE_SWAP") return v.swapped?"NEW DEVICE":"same device";
   if("swapped" in v) return v.swapped?"SWAPPED recently":"no swap";
   if("roaming" in v) return v.roaming?"roaming ("+(v.countryName||[])[0]+")":"not roaming";
   return JSON.stringify(v).slice(0,30); }
@@ -406,6 +407,7 @@ async function investigate(){
       <div class="ptxn">txn ${p.txn_id.slice(0,22)}… · operator ${sw.operator||"—"}</div>
       <div class="prow"><span class="papi">CAMARA · SIM Swap</span> ${sw.swapped ? '<span class="chip no">SWAPPED</span>' : '<span class="chip ok">no swap</span>'} <span class="muted">conf ${sw.signal_confidence ?? "—"}</span></div>
       <div class="prow"><span class="papi">CAMARA · Device Status</span> ${ds.roaming ? '<span class="chip" style="background:#FDF7F2;color:#B45309">roaming '+(ds.country||"")+'</span>' : '<span class="chip ok">home network</span>'}</div>
+      <div class="prow"><span class="papi">CAMARA · Device Swap</span> ${p.device_swap && p.device_swap.swapped ? '<span class="chip no">NEW DEVICE</span>' : p.device_swap && p.device_swap.swapped === false ? '<span class="chip ok">same device</span>' : '<span class="chip">unavailable</span>'}</div>
       <div class="prow"><span class="papi">CAMARA · Number Recycling</span> ${nr.phoneNumberRecycled === true ? '<span class="chip no">RECYCLED — takeover vector</span>' : nr.phoneNumberRecycled === false ? '<span class="chip ok">not recycled</span>' : '<span class="chip">unavailable</span>'}</div>
     </div>`;
   }).join("");

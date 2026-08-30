@@ -113,7 +113,8 @@ class NacClient:
 
     @staticmethod
     def _recording_key(signal_name: str) -> str:
-        return {"SIM_SWAP": "sim_swap", "DEVICE_STATUS": "roaming"}.get(signal_name, "connectivity")
+        return {"SIM_SWAP": "sim_swap", "DEVICE_STATUS": "roaming",
+                "DEVICE_SWAP": "device_swap"}.get(signal_name, "connectivity")
 
     # --- the three CAMARA calls -------------------------------------------
     def sim_swap(self, msisdn: str, max_age_hours: int, deadline_remaining: float) -> Signal:
@@ -131,6 +132,16 @@ class NacClient:
         if sig.value is not None:
             # roaming alone is not fraud (expat reality) — small contribution
             sig.risk = 8.0 if sig.value.get("roaming") else 0.0
+        return sig
+
+    def device_swap(self, msisdn: str, deadline_remaining: float) -> Signal:
+        """CAMARA Device Swap: did the number move to a DIFFERENT device (IMEI-level)?
+        Complements SIM Swap — catches number re-registration without a SIM change."""
+        sig = self._guard("DEVICE_SWAP", msisdn, deadline_remaining,
+                          lambda t: self._post("passthrough/camara/v1/device-swap/device-swap/v1/check",
+                                               {"phoneNumber": msisdn}, t))
+        if sig.value is not None:
+            sig.risk = 20.0 if sig.value.get("swapped") else 0.0
         return sig
 
     def number_recycling(self, msisdn: str, before: str = "2026-06-16T00:00:00Z") -> Signal:

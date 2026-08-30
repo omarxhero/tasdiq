@@ -1,0 +1,77 @@
+{
+  "txn_id": "dswap-4live-evidence",
+  "decision": "APPROVE",
+  "band": "CLEAN",
+  "weighted_risk": 0.0,
+  "total_risk": 0.0,
+  "reasons": [
+    {
+      "name": "SIM_SWAP",
+      "value": {
+        "swapped": false
+      },
+      "confidence": 1.0,
+      "risk": 0.0,
+      "fetched_at": "2026-08-30T15:25:48Z",
+      "source": "nokia_nac",
+      "operator": "SIM-OPERATOR-A",
+      "degradation": null,
+      "latency_ms": 491
+    },
+    {
+      "name": "NUMBER_VERIFY",
+      "value": "MATCH_ASSUMED",
+      "confidence": 0.3,
+      "risk": 0.0,
+      "fetched_at": "2026-08-30T15:25:49Z",
+      "source": "nokia_nac",
+      "operator": "SIM-OPERATOR-A",
+      "degradation": "AUTH_PENDING",
+      "latency_ms": 0
+    },
+    {
+      "name": "DEVICE_STATUS",
+      "value": {
+        "lastStatusTime": "2026-08-30T15:25:49.327365Z",
+        "roaming": false,
+        "countryCode": 36,
+        "countryName": [
+          "HU"
+        ]
+      },
+      "confidence": 1.0,
+      "risk": 0.0,
+      "fetched_at": "2026-08-30T15:25:49Z",
+      "source": "nokia_nac",
+      "operator": "SIM-OPERATOR-A",
+      "degradation": null,
+      "latency_ms": 377
+    },
+    {
+      "name": "DEVICE_SWAP",
+      "value": {
+        "swapped": false
+      },
+      "confidence": 1.0,
+      "risk": 0.0,
+      "fetched_at": "2026-08-30T15:25:49Z",
+      "source": "nokia_nac",
+      "operator": "SIM-OPERATOR-A",
+      "degradation": null,
+      "latency_ms": 388
+    }
+  ],
+  "step_up": {
+    "allowed": [],
+    "prohibited": []
+  },
+  "policy_id": "bank-a-v1",
+  "policy_version_hash": "sha256:0cde8a6a6a6dee6f506470539af04fb3143bd749f1a25c4c56cb0f2b6f5442ce",
+  "latency": {
+    "end_to_end_ms": 1260,
+    "internal_ms": 4,
+    "external_network_ms": 1256,
+    "budget_ms": 6000
+  },
+  "_note": "Extended-budget evidence run (6000ms) capturing all four CAMARA signals live through the pipeline; production budget stays 450ms with graceful BUDGET_MISS degradation."
+}
