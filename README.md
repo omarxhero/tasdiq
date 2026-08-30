@@ -95,6 +95,12 @@ sovereign deployments — hosted models see **synthetic demo data only**).
 |---|---|
 | Phone mockup ("Nile Bank — InstaPay"), 5 scenario chips, bilingual AR/EN results, Face-ID step-up ("no SMS was ever sent") | Decision badge + band, confidence bars, step-up chips (SMS ✗ crossed on swap bands), dual latency, tripwire → **AI panel showing each CAMARA call the agent made**, tamper + canary buttons, audit chain |
 
+### Screenshots (live demo)
+
+| Customer view — attack stopped | Fraud Ops — agent orchestrating CAMARA |
+|---|---|
+| ![Customer view](evidence/portal/ui_customer_swap_result.png) | ![Agent CAMARA orchestration](evidence/portal/ui_agent_orchestration.png) |
+
 Scenarios: normal payment · **SIM-swap attack** (early-exit decline) · recent swap
 (sensible weighting) · dual-SIM user (downweight, no false alarm) · **snatch-&-run**
 (behavioral detection, biometric-only step-up).
