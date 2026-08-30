@@ -12,7 +12,7 @@ model) for bilingual compliance drafting and investigations.
 > the engine decides every transaction inline (450ms budget: two 200ms signal phases +
 > 50ms margin); the AI never decides — it explains, investigates, and drafts paperwork.
 
-![Tests](https://img.shields.io/badge/tests-13%2F13-green) ![CAMARA](https://img.shields.io/badge/CAMARA-4%20APIs%20live-blue) ![Ablation](https://img.shields.io/badge/ablation-%2B0.50%20recall-orange)
+![Tests](https://img.shields.io/badge/tests-17%2F17-green) ![CAMARA](https://img.shields.io/badge/CAMARA-4%20APIs%20live-blue) ![Ablation](https://img.shields.io/badge/ablation-%2B0.50%20recall-orange)
 
 ---
 
@@ -62,7 +62,7 @@ bank ──► /v1/decide ──► [L1 CAMARA: SIM-Swap ▸ Number-Verify ▸ D
 ```bash
 pip install -r requirements.txt
 cp .env.example .env            # add your keys (see below)
-python -m pytest tests/ -q      # 13 tests — engine rules, tamper rejection, canary
+python -m pytest tests/ -q      # 17 tests — engine rules, tamper rejection, canary, proportionality policy
 python demo/run_demo.py         # live end-to-end evidence run → evidence/
 python ablation/run.py          # 200-case ablation study
 python -m uvicorn app.main:app --port 8793
@@ -137,7 +137,7 @@ Scenarios: normal payment · **SIM-swap attack** (early-exit decline) · recent 
   (0.9) escaped the band — fixed to ≥ 0.9.*
 - **Latency:** dual-reported — end-to-end (incl. Nokia sandbox RTT) vs internal
   execution. The sandbox is shared dev infrastructure; we show its overhead, not hide it.
-- **Tests:** 13/13 — rule ordering, early exit, Ed25519 tamper rejection, injection
+- **Tests:** 17/17 — rule ordering, early exit, Ed25519 tamper rejection, injection,
   canary, breaker behavior, ledger chains, pseudonymization.
 - **Evidence:** `evidence/live_calls/` (first live CAMARA call), `evidence/demo_run/`
   (full live run), `evidence/ablation_results.json`, `evidence/portal/` (UI
