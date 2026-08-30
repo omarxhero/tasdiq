@@ -210,6 +210,22 @@ Deps: `pip install -r requirements.txt` (+ network-as-code installed).
   (cover stat, L1, business slide — rebuilt), portal txt (+changelog 47),
   Guidebook PDF (re-rendered).
 
+## 7.12 DEVICE-SWAP GREY-GAP NOTES (external review, adjudicated)
+1. FALSE-POSITIVE SCOPE: Device Swap carries risk 20 ONLY — far below escalate
+   (55). It can never escalate alone; it corroborates SIM Swap / behavioral.
+   Legitimate triggers (user buys a new phone) are absorbed by weighting, never
+   declined outright. NOTE: friend's proposed cross-check ("Device Status IMEI
+   matched to bank-registered profile") references a nonexistent API capability —
+   CAMARA Device Status = roaming/connectivity only; no bank IMEI registry exists.
+2. TIMEOUT BEHAVIOR: only device-swap:check is used (never the slow
+   retrieve-date variant). The signal is deadline-budgeted like every other:
+   timeout -> BUDGET_MISS -> confidence 0.0 -> coverage drops -> conservative
+   escalation per rules 2/4 (live-captured in four_signal_live_decision.json).
+3. CONSENT: device-swap:check consent scope (device-association data) is bundled
+   into the bank-app enrollment T&C along with the other CAMARA scopes, with
+   logged receipts (extends v2.7 item 35; Phase 1 legal workstream, SAMA/CBE
+   sensitive).
+
 ## 8. GIT STATE
 Local repo initialized at handoff time (see `git log`). Working tree = state
 described in §2. Branch: main.
