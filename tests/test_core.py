@@ -264,3 +264,53 @@ def test_hostile_memo_does_not_influence_skip():
     assert a1["t1"]["skipped"] == a2["t1"]["skipped"] == ["DEVICE_SWAP", "NUMBER_RECYCLING"]
     # and the memo text never enters the policy decision inputs
     assert all("SKIP" not in str(v) for v in (a1["t1"]["probes"], a1["t1"]["why"]))
+
+
+def test_skip_audit_is_hash_chained(tmp_path):
+    """Skip audits enter the real Agent Ledger and are hash-chained —
+    tampering with a skip entry breaks the chain (non-repudiation)."""
+    import json as _j
+    from app.ledger import DualLedger
+    from app.ai.agent import TasdiqAgent
+    led = DualLedger(tmp_path, pepper="test-pepper")
+    recs = [{"msisdn_hash": led.pseudonym("+99999991001"),
+             "signals": [{"name": "SIM_SWAP", "confidence": 1.0, "value": {"swapped": True}}]}]
+    known = {"device_swap": {"swapped": True},
+             "number_recycling": {"phoneNumberRecycled": True}}
+
+    class Tools:
+        ALL_PROBES = ("SIM_SWAP", "DEVICE_STATUS", "DEVICE_SWAP", "NUMBER_RECYCLING")
+        ledger = led
+        def known_facts(self, txn_id): return known
+        def recent_txn_pressure(self, h, window_s=3600): return 0
+        def ledger_projection(self, txn_id): return {"records": recs}
+        def audit_skip(self, txn_id, skipped, facts_source):
+            payload = {"skipped": skipped, "facts_source": facts_source}
+            led.append_agent(txn_id, "probes_skipped_by_policy",
+                             _h.sha256(_j.dumps(payload, sort_keys=True).encode()).hexdigest())
+        def camara_probe_for_txn(self, txn_id, signals=None):
+            return {"txn_id": txn_id, "probes_run": list(signals or self.ALL_PROBES)}
+
+    import hashlib as _h
+    agent = TasdiqAgent.__new__(TasdiqAgent)
+    agent.tools = Tools()
+    agent._strict_json = lambda *a, **k: None
+    agent.investigate_cluster({"txn_ids": ["t-skip-1"]})
+
+    lines = open(led.agent_path, encoding='utf-8').read().splitlines()
+    entries = [_j.loads(l) for l in lines]
+    skip_idx = [i for i, e in enumerate(entries) if e.get("task") == "probes_skipped_by_policy"]
+    assert skip_idx, "skip audit entry missing from Agent Ledger"
+    # chain linkage intact before tamper
+    res = led.verify_chains()["agent"]["intact"]
+    assert res, "agent chain broken before tamper"
+    # tamper: rewrite the skip entry's hash -> next entry's prev_hash no longer matches
+    # real ledgers keep growing — a followup entry chains onto the skip entry
+    led.append_agent("t-skip-1", "followup_probe", "d" * 64)
+    lines = open(led.agent_path, encoding='utf-8').read().splitlines()
+    entries = [_j.loads(l) for l in lines]
+    k = [i for i, e in enumerate(entries) if e.get("task") == "probes_skipped_by_policy"][0]
+    entries[k]["hash"] = "0" * 64                     # attacker rewrites skip entry
+    tampered = chr(10).join(_j.dumps(e) for e in entries)
+    open(led.agent_path, 'w', encoding='utf-8').write(tampered)
+    assert not led.verify_chains()["agent"]["intact"], "tampered skip entry NOT detected"

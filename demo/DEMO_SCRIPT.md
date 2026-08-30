@@ -55,5 +55,8 @@ never apologize for it.
    blend 1.00 recall — the two signal families are complementary. Labeled
    synthetic; partner-operator data is Phase 1.
 7. "Does the LLM decide which probes run?" → "No. A deterministic proportionality policy decides. The LLM only writes the natural-language explanation of why the policy skipped a probe. The policy is code, not the model." (verbatim — practice it)
-8. "Sovereignty?" → hosted models see synthetic demo data only; production runs
+
+8. "450ms budget but observed latency is higher?" → "Two numbers: internal execution is single-digit ms; end-to-end includes the shared sandbox RTT (200–1,300ms). Production calls NaC from the bank's own VPC — sub-50ms RTT, well inside budget."
+9. "Synthetic cases = real fraud?" → "We don't claim that — they stress the engine's logic across the full feature space, reproducibly (seed 2026). The varied dataset caught a real engine bug. Partner data is Phase 1."
+10. "Device Swap false positives (eSIM toggles)?" → "Risk 20, corroboration-only — never escalates alone. A legitimate toggle costs at most a biometric step-up, never a decline."8. "Sovereignty?" → hosted models see synthetic demo data only; production runs
    self-hosted open weights in the bank's cloud. No PII crosses a border.

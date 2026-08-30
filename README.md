@@ -17,7 +17,7 @@ never the architecture.
 > the engine decides every transaction inline (450ms budget: two 200ms signal phases +
 > 50ms margin); the AI never decides — it explains, investigates, and drafts paperwork.
 
-![Tests](https://img.shields.io/badge/tests-19%2F19-green) ![CAMARA](https://img.shields.io/badge/CAMARA-4%20APIs%20live-blue) ![Ablation](https://img.shields.io/badge/ablation-%2B0.50%20recall-orange)
+![Tests](https://img.shields.io/badge/tests-20%2F20-green) ![CAMARA](https://img.shields.io/badge/CAMARA-4%20APIs%20live-blue) ![Ablation](https://img.shields.io/badge/ablation-%2B0.50%20recall-orange)
 
 ---
 
@@ -67,7 +67,7 @@ bank ──► /v1/decide ──► [L1 CAMARA: SIM-Swap ▸ Number-Verify ▸ D
 ```bash
 pip install -r requirements.txt
 cp .env.example .env            # add your keys (see below)
-python -m pytest tests/ -q      # 19 tests — engine rules, tamper rejection, canary, proportionality policy
+python -m pytest tests/ -q      # 20 tests — engine rules, tamper rejection, canary, proportionality policy
 python demo/run_demo.py         # live end-to-end evidence run → evidence/
 python ablation/run.py          # 200-case ablation study
 python -m uvicorn app.main:app --port 8793
@@ -90,15 +90,20 @@ sovereign deployments — hosted models see **synthetic demo data only**).
 | `GET /v1/metrics` | Engine metrics |
 | `GET /docs` | Machine-readable OpenAPI spec — banks can generate client SDKs from it (locked inter-service contracts are a Phase-1 workstream) |
 
-> **Deployment topology:** the prototype serves `/docs` openly for evaluation. Production
-deployment requires these endpoints behind an enterprise API gateway (Kong/Apigee-class)
-enforcing mutual TLS, bank↔Tasdiq IP allow-listing, and payload signature verification —
-the raw FastAPI surface is never internet-facing.
 | `POST /v1/policy/verify` | Policy-bundle signature verification (tamper demo) |
 | `POST /v1/agent/explain` · `/report` · `/customer_alert` | Async AI outputs (schema-locked JSON) |
 | `POST /v1/agent/investigate` | **Agent-orchestrated CAMARA re-queries** for a tripwire cluster (sealed tool belt) |
 | `POST /v1/agent/copilot` | Analyst Q&A from ledger projection only (no PII) |
 | `POST /v1/agent/canary` | Prompt-injection containment proof |
+
+> **Deployment topology:** the prototype serves `/docs` openly for evaluation. Production
+deployment requires these endpoints behind an enterprise API gateway (Kong/Apigee-class)
+enforcing mutual TLS, bank↔Tasdiq IP allow-listing, payload signature verification, and
+rate limiting on audit endpoints (`/v1/replay` is I/O-heavy — gateway-level rate limits
+protect the inline rail's worker threads). For low-latency guarantees the production
+instance collocates at the operator edge or terminates a dedicated UPF data path into
+the regional operator core — public-internet BGP routing would waste the 5G URLLC budget.
+
 
 ## Why each CAMARA API earns its place
 
@@ -113,13 +118,22 @@ A missing signal is not an opening — it's a tightening. Confidence drops to 0,
 coverage/primary-loss rules escalate, step-up collapses to biometric-only, and
 high-value instant clearance locks until signals return. Attackers who force a
 degraded state force a stricter bank, not a blinder one. And in the async lane the agent may skip a probe only when
+Behavioral floor: ≥2 transactions for the same account within one hour
+forces a full sweep — no skips allowed (attack windows look like busy accounts).
 independent corroboration makes it mathematically redundant (e.g. Device Swap
 already confirmed in a prior pass + inline SIM Swap ≥ 0.9); the inline rail
 always calls all 4 — skips happen only after the bank has its decision.
 
+`known_facts` are populated only from CAMARA API responses recorded in prior
+probes (Agent Ledger) — never from LLM-generated text. The agent cannot
+self-populate its skip logic through its own prose.
+
 Together with bank-side behavioral signals (payee recency, velocity, amount-vs-mean), the
 four families cover number theft, device re-registration, phone-in-hand theft, and
 coercion-style anomalies — no single signal covers them all.
+
+Number Recycling (bonus, tool-belt-only) is Nokia NaC's own number-recycling
+endpoint — separate from the 4 inline CAMARA APIs.
 
 ## Demo UI (two views)
 
@@ -163,7 +177,7 @@ Scenarios: normal payment · **SIM-swap attack** (early-exit decline) · recent 
   (0.9) escaped the band — fixed to ≥ 0.9.*
 - **Latency:** dual-reported — end-to-end (incl. Nokia sandbox RTT) vs internal
   execution. The sandbox is shared dev infrastructure; we show its overhead, not hide it.
-- **Tests:** 19/19 — rule ordering, early exit, Ed25519 tamper rejection, injection,
+- **Tests:** 20/20 — rule ordering, early exit, Ed25519 tamper rejection, injection,
   canary, breaker behavior, ledger chains, pseudonymization.
 - **Evidence:** `evidence/live_calls/` (first live CAMARA call), `evidence/demo_run/`
   (full live run), `evidence/ablation_results.json`, `evidence/portal/` (UI

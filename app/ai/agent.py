@@ -86,6 +86,10 @@ class TasdiqAgent:
 
     # ---------- tool-belt investigation (orchestration requirement) ------------
     ALL_PROBES = ("SIM_SWAP", "DEVICE_STATUS", "DEVICE_SWAP", "NUMBER_RECYCLING")
+    # behavioral floor: >= PRESSURE_FULL_SWEEP_THRESHOLD intercept records for the
+    # same account within PRESSURE_WINDOW_S seconds -> skips disabled, full sweep
+    PRESSURE_FULL_SWEEP_THRESHOLD = 2
+    PRESSURE_WINDOW_S = 3600
 
     def _proportionate_selection(self, cluster: dict):
         """DETERMINISTIC proportionality policy — code, not the model.
@@ -115,7 +119,7 @@ class TasdiqAgent:
             # the full forensic sweep. Skips are a quiet-period optimization.
             pressure = self.tools.recent_txn_pressure(
                 (recs[0].get("msisdn_hash") if recs else "") or "") if self.tools else 999
-            if pressure < 2:
+            if pressure < self.PRESSURE_FULL_SWEEP_THRESHOLD:
                 # redundancy skip: DEVICE_SWAP already re-confirmed in a prior pass
                 # + independently corroborated by the inline rail (two sources)
                 if prev_ds is True and sim_confirmed:
