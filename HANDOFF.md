@@ -185,6 +185,31 @@ Deps: `pip install -r requirements.txt` (+ network-as-code installed).
   LinkedIn; ablation numbers updated. build_pptx.py is canonical — kept in sync.
 - Portal txt: changelog v2.9 (items 41-46).
 
+## 7.11 DEVICE SWAP + GITHUB LIVE (2026-08-30, evening)
+- 4th inline CAMARA signal: Device Swap (passthrough/camara/v1/device-swap/
+  device-swap/v1/check — v1 NOT v0; found via the NaC SDK site-packages, 6 v0
+  guesses 404'd). Live verified: +99999991000 swapped:true, +99999991001 false.
+- Wired: nac.py device_swap() (breaker+recordings+fallback pattern, risk 20),
+  decide.py Phase 2 [sim,nv,roam,ds], tools.py 4th probe, UI sigName/fmtVal/
+  probe row, StubNac updated. Tests 14/14. Ablation unchanged (+0.50) — stub
+  cases have no DS signal by design.
+- Evidence: evidence/live_calls/device_swap_live_probe.json (direct 200) +
+  four_signal_live_decision.json (extended-budget 6000ms labeled run — ALL FOUR
+  signals live conf 1.0; at 450ms the slow sandbox SIM call eats phase 2 ->
+  honest BUDGET_MISS degradation, which is the designed behavior).
+- GOTCHA that cost time: fresh-clone test + mv restore nested ledger.keep
+  inside ledger_store/, dev-key vault.bin shadowed the real one -> Fernet
+  InvalidToken + old server still on port serving stale code. Fixed: kill PID,
+  ledger.keep/* restored to ledger_store/, restart. ALWAYS netstat the port
+  owner after a restart "fails silently".
+- Repo LIVE: https://github.com/omarxhero/tasdiq (created via API with user
+  PAT; pushed via one-shot URL so the token is NOT in .git/config). Only .pub
+  keys on GitHub; .key + .env + ledger_store ignored. Token + all API keys:
+  ROTATE AFTER HACKATHON (token was pasted in chat).
+- Docs now say 4 APIs everywhere: README (badge, rail, diagram), deck v2.9
+  (cover stat, L1, business slide — rebuilt), portal txt (+changelog 47),
+  Guidebook PDF (re-rendered).
+
 ## 8. GIT STATE
 Local repo initialized at handoff time (see `git log`). Working tree = state
 described in §2. Branch: main.
