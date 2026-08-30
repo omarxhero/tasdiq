@@ -83,11 +83,25 @@ sovereign deployments — hosted models see **synthetic demo data only**).
 | `POST /v1/decide` | The decision rail (decision, band, step-up allow/prohibit, dual latency, policy hash) |
 | `POST /v1/replay` | Audit replay of any transaction from the ledger |
 | `GET /v1/metrics` | Engine metrics |
+| `GET /docs` | Machine-readable OpenAPI spec (auto-generated contract) |
 | `POST /v1/policy/verify` | Policy-bundle signature verification (tamper demo) |
 | `POST /v1/agent/explain` · `/report` · `/customer_alert` | Async AI outputs (schema-locked JSON) |
 | `POST /v1/agent/investigate` | **Agent-orchestrated CAMARA re-queries** for a tripwire cluster (sealed tool belt) |
 | `POST /v1/agent/copilot` | Analyst Q&A from ledger projection only (no PII) |
 | `POST /v1/agent/canary` | Prompt-injection containment proof |
+
+## Why each CAMARA API earns its place
+
+| API | The question it answers | What breaks without it |
+|---|---|---|
+| **SIM Swap** | Did this number move to a new SIM? | Misses classic number-theft takeover; SMS step-up could reach the attacker |
+| **Device Swap** | Did the number move to a different *device*? | Blind to re-registration without a SIM change — SIM Swap's blind spot |
+| **Number Verification** | Does the number match the paying device? | No silent possession check — every payment needs an OTP (or worse, none) |
+| **Device Status** | Roaming / country / connectivity? | Loses context: a "weird" payment from a roaming regular traveler looks identical to a hacked one |
+
+Together with bank-side behavioral signals (payee recency, velocity, amount-vs-mean), the
+four families cover number theft, device re-registration, phone-in-hand theft, and
+coercion-style anomalies — no single signal covers them all.
 
 ## Demo UI (two views)
 

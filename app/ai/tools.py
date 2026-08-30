@@ -72,28 +72,46 @@ class ToolBelt:
                 "country": (v.get("countryName") or [None])[0],
                 "connectivity_hint": v.get("lastStatusTime")}
 
-    def camara_probe_for_txn(self, txn_id: str):
-        """Investigation entry: txn -> hash -> sealed CAMARA re-query (structured facts out)."""
+    ALL_PROBES = ("SIM_SWAP", "DEVICE_STATUS", "DEVICE_SWAP", "NUMBER_RECYCLING")
+
+    def camara_probe_for_txn(self, txn_id: str, signals=None):
+        """Investigation entry: txn -> hash -> sealed CAMARA re-query (structured facts out).
+        `signals` = proportionate subset chosen by the agent (None -> full sweep)."""
         h = self.txn_index.get(txn_id)
         if not h:
             return {"txn_id": txn_id, "error": "not found"}
-        recyc = None
-        dswap = None
+        chosen = [s for s in self.ALL_PROBES if not signals or s in signals]
+        out = {"txn_id": txn_id, "probes_run": chosen, "ts": time.time()}
         try:
             raw = self.vault.resolve(h)
-            if raw:
-                rr = self.nac.number_recycling(raw)
-                recyc = {"phoneNumberRecycled": (rr.value or {}).get("phoneNumberRecycled")}
-                dsv = self.nac.device_swap(raw, 3.0)
-                dswap = {"swapped": (dsv.value or {}).get("swapped")}
         except Exception:
-            recyc = {"error": "unavailable"}
-            dswap = {"error": "unavailable"}
-        out = {"txn_id": txn_id, "sim_swap": self._structured_swap(h),
-               "device_status": self._structured_status(h),
-               "device_swap": dswap,
-               "number_recycling": recyc, "ts": time.time()}
-        self.log(f"[TOOLBELT][investigation] txn={txn_id} -> structured facts only")
+            raw = None
+        if raw is None:
+            out["error"] = "unknown hash"
+            return out
+        if "SIM_SWAP" in chosen:
+            try:
+                out["sim_swap"] = self._structured_swap(h)
+            except Exception:
+                out["sim_swap"] = {"error": "budget/unavailable"}
+        if "DEVICE_STATUS" in chosen:
+            try:
+                out["device_status"] = self._structured_status(h)
+            except Exception:
+                out["device_status"] = {"error": "budget/unavailable"}
+        if "DEVICE_SWAP" in chosen:
+            try:
+                dsv = self.nac.device_swap(raw, 3.0)
+                out["device_swap"] = {"swapped": (dsv.value or {}).get("swapped")}
+            except Exception:
+                out["device_swap"] = {"error": "unavailable"}
+        if "NUMBER_RECYCLING" in chosen:
+            try:
+                rr = self.nac.number_recycling(raw)
+                out["number_recycling"] = {"phoneNumberRecycled": (rr.value or {}).get("phoneNumberRecycled")}
+            except Exception:
+                out["number_recycling"] = {"error": "unavailable"}
+        self.log(f"[TOOLBELT][investigation] txn={txn_id} probes={chosen} -> structured facts only")
         self.ledger.append_agent(txn_id, "toolbelt_investigation",
                                  hashlib.sha256(json.dumps(out, sort_keys=True).encode()).hexdigest())
         return out

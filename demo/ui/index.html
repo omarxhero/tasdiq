@@ -400,11 +400,18 @@ async function investigate(){
   const ids = recentTxns.length ? recentTxns.slice(-3) : [lastTxn];
   const cl = {cluster_alert:true, count:ids.length, region:SCEN[current].region, txn_ids:ids};
   const j = await api("/v1/agent/investigate", cl);
+  const sel = j.selection||{};
   const probes = (j.investigation||[]).map(p => {
     if(p.error) return `<div class="probe"><b>${p.txn_id?.slice(0,20)}…</b> <span class="chip no">not found</span></div>`;
     const sw = p.sim_swap||{}, ds = p.device_status||{}, nr = p.number_recycling||{};
+    const mySel = sel[p.txn_id];
+    const ran = (p.probes_run||[]).length;
+    const selLine = mySel
+      ? `<div class="prow"><span class="papi">🧠 agent decision</span> ran ${ran}/4 probes — <i>${mySel.why||"proportionate subset"}</i></div>`
+      : `<div class="prow"><span class="papi">🧠 agent decision</span> full sweep (4/4) — pattern not yet characterized</div>`;
     return `<div class="probe">
       <div class="ptxn">txn ${p.txn_id.slice(0,22)}… · operator ${sw.operator||"—"}</div>
+      ${selLine}
       <div class="prow"><span class="papi">CAMARA · SIM Swap</span> ${sw.swapped ? '<span class="chip no">SWAPPED</span>' : '<span class="chip ok">no swap</span>'} <span class="muted">conf ${sw.signal_confidence ?? "—"}</span></div>
       <div class="prow"><span class="papi">CAMARA · Device Status</span> ${ds.roaming ? '<span class="chip" style="background:#FDF7F2;color:#B45309">roaming '+(ds.country||"")+'</span>' : '<span class="chip ok">home network</span>'}</div>
       <div class="prow"><span class="papi">CAMARA · Device Swap</span> ${p.device_swap && p.device_swap.swapped ? '<span class="chip no">NEW DEVICE</span>' : p.device_swap && p.device_swap.swapped === false ? '<span class="chip ok">same device</span>' : '<span class="chip">unavailable</span>'}</div>

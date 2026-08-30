@@ -85,14 +85,44 @@ class TasdiqAgent:
         return out
 
     # ---------- tool-belt investigation (orchestration requirement) ------------
+    def _select_probes(self, cluster: dict):
+        """Proportionality step: the agent decides WHICH signals are worth
+        re-checking for this cohort (model call, strict JSON). Returns
+        {txn_id: {"probes": [...], "why": str}} or None -> full sweep fallback."""
+        if not self.tools:
+            return None
+        facts = {k: cluster.get(k) for k in ("count", "region", "txn_ids", "window_s") if k in cluster}
+        out = self._strict_json(
+            "You are the fraud investigation lead. For each transaction below decide which "
+            "CAMARA signals are worth re-checking right now. Signals available: SIM_SWAP, "
+            "DEVICE_STATUS, DEVICE_SWAP, NUMBER_RECYCLING. Be proportionate: re-check what "
+            "would change the analysis; say why in one short clause. "
+            f"CLUSTER FACTS: {json.dumps(facts)} "
+            'Return JSON: {"selections": [{"txn_id": str, "probes": [str], "why": str}]}',
+            ["selections"])
+        if not out or not isinstance(out.get("selections"), list):
+            return None
+        valid = set(__import__("app.ai.tools", fromlist=["ToolBelt"]).ToolBelt.ALL_PROBES)
+        sel = {}
+        for s in out["selections"]:
+            tid = s.get("txn_id")
+            probes = [p for p in (s.get("probes") or []) if p in valid]
+            if tid and probes:
+                sel[tid] = {"probes": probes, "why": s.get("why", "")}
+        return sel or None
+
     def investigate_cluster(self, cluster: dict) -> dict:
-        """Agent autonomously re-queries CAMARA for the cohort via its sealed tool belt."""
+        """Agent autonomously decides which CAMARA signals to re-check for the
+        cohort (proportionality), then executes its selection via the sealed
+        tool belt. No selection -> full sweep (deterministic fallback)."""
+        selection = self._select_probes(cluster)
         probes = []
         if self.tools:
             for txn_id in cluster.get("txn_ids", [])[:5]:
-                probes.append(self.tools.camara_probe_for_txn(txn_id))
+                sel = (selection or {}).get(txn_id)
+                probes.append(self.tools.camara_probe_for_txn(txn_id, signals=sel["probes"] if sel else None))
         analysis = self.cluster_and_recommend(cluster)
-        return {"investigation": probes, "analysis": analysis}
+        return {"selection": selection, "investigation": probes, "analysis": analysis}
 
     # ---------- analyst copilot --------------------------------------------------
     def copilot_answer(self, question: str, txn_id: str) -> dict:
