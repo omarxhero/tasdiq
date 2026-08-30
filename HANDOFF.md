@@ -226,6 +226,36 @@ Deps: `pip install -r requirements.txt` (+ network-as-code installed).
    logged receipts (extends v2.7 item 35; Phase 1 legal workstream, SAMA/CBE
    sensitive).
 
+## 7.13 PROPORTIONALITY POLICY v2 (external review — the big refactor)
+- external review was RIGHT about the one real flaw: selective probing originally let
+  the LLM decide probe subsets — contradicting our own core principle
+  ("deterministic security, generative compliance"). REFACTORED:
+  * agent._proportionate_selection = DETERMINISTIC policy code (no model):
+    default full sweep; skip only on mathematical redundancy (prior-pass probe
+    facts + inline corroboration). Device Swap skip needs BOTH prior-pass
+    confirmation AND inline SIM Swap conf>=0.9 swapped (two independent
+    sources). Recycling = static fact -> redundant once answered.
+  * LLM renders policy decisions into prose ONLY (_render_reasons,
+    schema-locked, deterministic template fallback). "The policy decides; the
+    agent runs; the LLM explains."
+  * ledger.py: intercept records now store structured "signals" (no free text)
+    — enables policy + richer forensic replay.
+  * tools.py: _probe_facts memory + known_facts(); probe errors return
+    structured errors to the agent (never 500).
+- Tests 14 -> 17 (first-pass full sweep; two-signal redundancy skip;
+  single-signal never skips + static-fact skip). LIVE VERIFIED via UI:
+  pass1 full sweep 4/4 -> pass2 selective 2/4 with policy line on screen.
+- Windows lesson (twice now): git-bash ps can't kill native processes — kill
+  by netstat PID (taskkill //F //PID). Port 10048 = stale server still owner.
+- README: "what breaks" column reframed to "System behavior without it
+  (degraded state)" (attacker-cheatsheet concern; we never have open gaps —
+  missing signal = conf 0 = tighten); "contract" wording dropped (G5);
+  redundancy footnote added. main.py: route summaries/descriptions for /docs.
+- VERBATIM judge answer (practice): "Does the LLM decide which probes run?"
+  "No. A deterministic proportionality policy decides. The LLM only writes the
+  natural-language explanation of why the policy skipped a probe. The policy
+  is code, not the model."
+
 ## 8. GIT STATE
 Local repo initialized at handoff time (see `git log`). Working tree = state
 described in §2. Branch: main.

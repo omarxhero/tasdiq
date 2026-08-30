@@ -400,15 +400,11 @@ async function investigate(){
   const ids = recentTxns.length ? recentTxns.slice(-3) : [lastTxn];
   const cl = {cluster_alert:true, count:ids.length, region:SCEN[current].region, txn_ids:ids};
   const j = await api("/v1/agent/investigate", cl);
-  const sel = j.selection||{};
   const probes = (j.investigation||[]).map(p => {
     if(p.error) return `<div class="probe"><b>${p.txn_id?.slice(0,20)}…</b> <span class="chip no">not found</span></div>`;
     const sw = p.sim_swap||{}, ds = p.device_status||{}, nr = p.number_recycling||{};
-    const mySel = sel[p.txn_id];
     const ran = (p.probes_run||[]).length;
-    const selLine = mySel
-      ? `<div class="prow"><span class="papi">🧠 agent decision</span> ran ${ran}/4 probes — <i>${mySel.why||"proportionate subset"}</i></div>`
-      : `<div class="prow"><span class="papi">🧠 agent decision</span> full sweep (4/4) — pattern not yet characterized</div>`;
+    const selLine = `<div class="prow"><span class="papi">🔒 policy decision</span> ${p.policy_line||"first forensic pass — full sweep"}${ran<4?` <span class="muted">(ran ${ran}/4)</span>`:''}</div>`;
     return `<div class="probe">
       <div class="ptxn">txn ${p.txn_id.slice(0,22)}… · operator ${sw.operator||"—"}</div>
       ${selLine}

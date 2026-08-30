@@ -37,6 +37,7 @@ class DualLedger:
             "policy_version_hash": policy_hash,
             "signals_digest": hashlib.sha256(json.dumps(
                 decision.get("reasons", []), sort_keys=True).encode()).hexdigest(),
+            "signals": decision.get("reasons", []),  # structured facts (no free text) — forensics + proportionality policy
             "ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         }
         rec["prev_hash"] = self._last_hash(self.intercept_path)

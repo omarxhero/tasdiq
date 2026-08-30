@@ -157,3 +157,57 @@ def test_device_swap_signal_contributes():
     # clean device-swap must not raise risk
     clean_ds = evaluate(base + [Signal("DEVICE_SWAP", {"swapped": False}, 1.0, 0.0)], b, pol)
     assert clean_ds["weighted_risk"] == without["weighted_risk"]
+
+
+# ---------------- agent proportionality policy ----------------
+def _stub_agent(records, known_facts):
+    """Offline agent with stub tools — no model, no network."""
+    from app.ai.agent import TasdiqAgent
+    class StubTools:
+        ALL_PROBES = ("SIM_SWAP", "DEVICE_STATUS", "DEVICE_SWAP", "NUMBER_RECYCLING")
+        def __init__(self):
+            self._records, self._known = records, known_facts
+        def known_facts(self, txn_id): return self._known
+        def ledger_projection(self, txn_id): return {"records": self._records}
+        def camara_probe_for_txn(self, txn_id, signals=None):
+            return {"txn_id": txn_id, "probes_run": list(signals or self.ALL_PROBES)}
+    agent = TasdiqAgent.__new__(TasdiqAgent)
+    agent.tools = StubTools()
+    agent._strict_json = lambda *a, **k: None      # model unavailable -> prose fallback
+    return agent
+
+
+def test_proportionality_first_pass_full_sweep():
+    recs = [{"signals": [{"name": "SIM_SWAP", "confidence": 1.0,
+                          "value": {"swapped": True}}]}]
+    agent = _stub_agent(recs, known_facts={})
+    sel = agent._proportionate_selection({"txn_ids": ["t1"]})
+    assert sel["t1"]["probes"] == ["SIM_SWAP", "DEVICE_STATUS", "DEVICE_SWAP", "NUMBER_RECYCLING"]
+    assert sel["t1"]["skipped"] == []          # first pass: forensic completeness
+
+
+def test_proportionality_redundancy_skip_needs_two_signals():
+    recs = [{"signals": [{"name": "SIM_SWAP", "confidence": 1.0,
+                          "value": {"swapped": True}}]}]
+    known = {"device_swap": {"swapped": True},
+             "number_recycling": {"phoneNumberRecycled": True}}
+    agent = _stub_agent(recs, known_facts=known)
+    sel = agent._proportionate_selection({"txn_ids": ["t1"]})
+    assert "DEVICE_SWAP" in sel["t1"]["skipped"]          # both corroborations present
+    assert "NUMBER_RECYCLING" in sel["t1"]["skipped"]
+
+
+def test_proportionality_single_signal_never_skips():
+    # static historical fact (recycling) -> redundant once answered, regardless
+    recs = [{"signals": []}]
+    known = {"number_recycling": {"phoneNumberRecycled": False}}
+    agent = _stub_agent(recs, known_facts=known)
+    sel = agent._proportionate_selection({"txn_ids": ["t1"]})
+    assert "NUMBER_RECYCLING" in sel["t1"]["skipped"]
+    assert "DEVICE_SWAP" in sel["t1"]["probes"]      # dynamic fact: never skip unconfirmed
+    # dynamic fact + sim NOT independently confirmed -> device swap still runs
+    recs2 = [{"signals": [{"name": "SIM_SWAP", "confidence": 0.3,
+                           "value": {"swapped": False}}]}]
+    agent2 = _stub_agent(recs2, known_facts={"device_swap": {"swapped": True}})
+    sel2 = agent2._proportionate_selection({"txn_ids": ["t1"]})
+    assert "DEVICE_SWAP" in sel2["t1"]["probes"] and "NUMBER_RECYCLING" in sel2["t1"]["probes"]

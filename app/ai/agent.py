@@ -85,44 +85,81 @@ class TasdiqAgent:
         return out
 
     # ---------- tool-belt investigation (orchestration requirement) ------------
-    def _select_probes(self, cluster: dict):
-        """Proportionality step: the agent decides WHICH signals are worth
-        re-checking for this cohort (model call, strict JSON). Returns
-        {txn_id: {"probes": [...], "why": str}} or None -> full sweep fallback."""
-        if not self.tools:
-            return None
-        facts = {k: cluster.get(k) for k in ("count", "region", "txn_ids", "window_s") if k in cluster}
-        out = self._strict_json(
-            "You are the fraud investigation lead. For each transaction below decide which "
-            "CAMARA signals are worth re-checking right now. Signals available: SIM_SWAP, "
-            "DEVICE_STATUS, DEVICE_SWAP, NUMBER_RECYCLING. Be proportionate: re-check what "
-            "would change the analysis; say why in one short clause. "
-            f"CLUSTER FACTS: {json.dumps(facts)} "
-            'Return JSON: {"selections": [{"txn_id": str, "probes": [str], "why": str}]}',
-            ["selections"])
-        if not out or not isinstance(out.get("selections"), list):
-            return None
-        valid = set(__import__("app.ai.tools", fromlist=["ToolBelt"]).ToolBelt.ALL_PROBES)
+    ALL_PROBES = ("SIM_SWAP", "DEVICE_STATUS", "DEVICE_SWAP", "NUMBER_RECYCLING")
+
+    def _proportionate_selection(self, cluster: dict):
+        """DETERMINISTIC proportionality policy — code, not the model.
+        Default: full sweep (forensic completeness). A probe may be skipped only
+        when re-running it is mathematically redundant (same facts already on
+        record from a prior pass + corroborated inline). Unknown -> full sweep."""
         sel = {}
-        for s in out["selections"]:
-            tid = s.get("txn_id")
-            probes = [p for p in (s.get("probes") or []) if p in valid]
-            if tid and probes:
-                sel[tid] = {"probes": probes, "why": s.get("why", "")}
-        return sel or None
+        for txn_id in cluster.get("txn_ids", [])[:5]:
+            probes, skipped, why_parts = list(self.ALL_PROBES), [], []
+            known = self.tools.known_facts(txn_id) if self.tools else {}
+            sim = None
+            try:
+                recs = self.tools.ledger_projection(txn_id).get("records", [])
+                for r in recs:
+                    for s in r.get("signals", []):
+                        if s.get("name") == "SIM_SWAP":
+                            sim = s
+            except Exception:
+                sim = None
+            prev_ds = (known.get("device_swap") or {}).get("swapped")
+            prev_nr = (known.get("number_recycling") or {}).get("phoneNumberRecycled")
+            sim_confirmed = bool(sim and sim.get("confidence", 0) >= 0.9
+                                 and isinstance(sim.get("value"), dict)
+                                 and sim["value"].get("swapped"))
+            # redundancy skip: DEVICE_SWAP already re-confirmed in a prior pass
+            if prev_ds is True and sim_confirmed:
+                probes.remove("DEVICE_SWAP")
+                skipped.append("DEVICE_SWAP")
+                why_parts.append("device re-registration already confirmed in prior pass")
+            # redundancy skip: NUMBER_RECYCLING already answered
+            if prev_nr is not None:
+                probes.remove("NUMBER_RECYCLING")
+                skipped.append("NUMBER_RECYCLING")
+                why_parts.append("recycling status already on record")
+            sel[txn_id] = {"probes": probes, "skipped": skipped,
+                           "why": "; ".join(why_parts) if why_parts else ""}
+        return sel
+
+    def _render_reasons(self, cluster: dict, sel: dict) -> dict:
+        """LLM renders the policy decision into plain language (schema-locked).
+        The model NEVER decides which probes run — policy code does. On any
+        model failure: deterministic template prose."""
+        decisions = [{"txn_id": t, "run": v["probes"], "skipped": v["skipped"],
+                      "policy_reason": v["why"] or "first forensic pass — full sweep"}
+                     for t, v in sel.items()]
+        out = self._strict_json(
+            "For each policy decision below, write one short plain-language line a bank "
+            "analyst can read. State what runs, what was skipped and the policy reason. "
+            f"DECISIONS: {json.dumps(decisions)} "
+            'Return JSON: {"lines": [{"txn_id": str, "line": str}]}',
+            ["lines"])
+        lines = {d["txn_id"]: (d["policy_reason"] or "first forensic pass — full sweep")
+                 for d in decisions}
+        if out and isinstance(out.get("lines"), list):
+            for row in out["lines"]:
+                if row.get("txn_id") in lines and row.get("line"):
+                    lines[row["txn_id"]] = row["line"]
+        return lines
 
     def investigate_cluster(self, cluster: dict) -> dict:
-        """Agent autonomously decides which CAMARA signals to re-check for the
-        cohort (proportionality), then executes its selection via the sealed
-        tool belt. No selection -> full sweep (deterministic fallback)."""
-        selection = self._select_probes(cluster)
+        """Agent executes the deterministic proportionality policy via its sealed
+        tool belt, then renders the policy decisions in plain language.
+        The policy decides; the agent runs; the LLM explains."""
+        sel = self._proportionate_selection(cluster)
         probes = []
         if self.tools:
             for txn_id in cluster.get("txn_ids", [])[:5]:
-                sel = (selection or {}).get(txn_id)
-                probes.append(self.tools.camara_probe_for_txn(txn_id, signals=sel["probes"] if sel else None))
+                s = sel.get(txn_id, {})
+                probes.append(self.tools.camara_probe_for_txn(txn_id, signals=s.get("probes")))
+        lines = self._render_reasons(cluster, sel)
+        for p in probes:
+            p["policy_line"] = lines.get(p.get("txn_id"), "first forensic pass — full sweep")
         analysis = self.cluster_and_recommend(cluster)
-        return {"selection": selection, "investigation": probes, "analysis": analysis}
+        return {"selection": sel, "investigation": probes, "analysis": analysis}
 
     # ---------- analyst copilot --------------------------------------------------
     def copilot_answer(self, question: str, txn_id: str) -> dict:

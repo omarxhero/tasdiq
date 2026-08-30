@@ -45,6 +45,7 @@ class ToolBelt:
         self.log = log
         self.calls = 0
         self.rate_budget = 20          # protects NaC sandbox quota
+        self._probe_facts = {}         # async-lane memory: last probe facts per txn (redundancy-skip)
 
     def _budget(self):
         self.calls += 1
@@ -111,10 +112,16 @@ class ToolBelt:
                 out["number_recycling"] = {"phoneNumberRecycled": (rr.value or {}).get("phoneNumberRecycled")}
             except Exception:
                 out["number_recycling"] = {"error": "unavailable"}
+        self._probe_facts[txn_id] = {"device_swap": out.get("device_swap"),
+                                     "number_recycling": out.get("number_recycling")}
         self.log(f"[TOOLBELT][investigation] txn={txn_id} probes={chosen} -> structured facts only")
         self.ledger.append_agent(txn_id, "toolbelt_investigation",
                                  hashlib.sha256(json.dumps(out, sort_keys=True).encode()).hexdigest())
         return out
+
+    def known_facts(self, txn_id: str) -> dict:
+        """Last recorded probe facts for this txn ({} if never probed)."""
+        return self._probe_facts.get(txn_id, {})
 
     def ledger_projection(self, txn_id: str) -> dict:
         """Memo-free projection: structured decision record only (no free text)."""

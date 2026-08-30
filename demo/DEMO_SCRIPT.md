@@ -50,5 +50,6 @@ never apologize for it.
 6. "Ablation?" → 200 varied synthetic cases: bank-only 0.50, telecom-only 0.50,
    blend 1.00 recall — the two signal families are complementary. Labeled
    synthetic; partner-operator data is Phase 1.
-7. "Sovereignty?" → hosted models see synthetic demo data only; production runs
+7. "Does the LLM decide which probes run?" → "No. A deterministic proportionality policy decides. The LLM only writes the natural-language explanation of why the policy skipped a probe. The policy is code, not the model." (verbatim — practice it)
+8. "Sovereignty?" → hosted models see synthetic demo data only; production runs
    self-hosted open weights in the bank's cloud. No PII crosses a border.
