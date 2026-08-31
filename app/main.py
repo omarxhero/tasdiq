@@ -7,7 +7,7 @@ HTTP locally with the auth middleware stubbed and clearly labeled.
 from __future__ import annotations
 import json, threading, time, uuid
 from pathlib import Path
-from fastapi import Body, Depends, FastAPI, HTTPException
+from fastapi import Body, Depends, FastAPI, HTTPException, Header, Request
 from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel, Field
 
@@ -69,7 +69,6 @@ agent.tools = ToolBelt(vault, nac, ledger, txn_index)
 
 app = FastAPI(title="Tasdiq — Telecom-Verified AI Risk Agent", version="0.1.0")
 
-from fastapi import Body, Request
 from fastapi.responses import JSONResponse as _JSONResp
 
 @app.exception_handler(Exception)
@@ -85,7 +84,6 @@ async def unhandled_exception_handler(request: Request, exc: Exception):
 # X-Tasdiq-Gateway-Signature header is missing/invalid (HMAC of raw body).
 import os as _os
 import hmac as _hmac, hashlib as _hashlib
-from fastapi import Header, HTTPException as _HTTPException
 
 GATEWAY_SECRET = _os.getenv("TASDIQ_GATEWAY_SECRET", "")
 
@@ -95,7 +93,7 @@ async def gateway_guard(request: Request, x_tasdiq_gateway_signature: str = Head
     body = (await request.body()) or b""
     expected = _hashlib.sha256((GATEWAY_SECRET + str(len(body))).encode()).hexdigest()
     if not _hmac.compare_digest(x_tasdiq_gateway_signature, expected):
-        raise _HTTPException(403, "gateway signature invalid")
+        raise HTTPException(403, "gateway signature invalid")
 
 
 # --- request/response contracts (Section 3 of the master doc) -----------------
