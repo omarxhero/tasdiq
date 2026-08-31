@@ -33,9 +33,23 @@ def bootstrap():
             gen_keypair(persona, KEYS)
     for pol in (DEFAULT_BANK_A, DEFAULT_BANK_B):
         p = POLICIES / f"{pol['policy_id']}.signed.json"
-        if not p.exists():
+        # Re-sign from the DEFAULT template whenever the on-disk bundle is
+        # missing OR its signature doesn't match the local keys (fresh clone,
+        # rotated keys). A genuinely tampered bundle is discarded, never
+        # honored — re-signing always starts from the trusted template.
+        # Runtime tampering (edit file, no reboot) is still rejected: the
+        # engine verifies on every /v1/decide.
+        need_sign = True
+        if p.exists():
+            try:
+                verify_bundle(json.loads(p.read_text()))
+                need_sign = False                      # keys match, keep it
+            except Exception:
+                print(f"[bootstrap] {p.name} failed verification (stale or "
+                      f"tampered) — re-signing from trusted defaults")
+        if need_sign:
             doc = {k: v for k, v in pol.items() if k != "signatures"}
-            doc.setdefault("signatures", {})
+            doc["signatures"] = {}
             doc["signatures"]["maker"] = load_key("maker", KEYS).sign(
                 canon({k: v for k, v in doc.items() if k != "signatures"})).hex()
             doc["signatures"]["checker"] = load_key("checker", KEYS).sign(
@@ -54,6 +68,15 @@ agent = TasdiqAgent(GeminiClient())
 agent.tools = ToolBelt(vault, nac, ledger, txn_index)
 
 app = FastAPI(title="Tasdiq — Telecom-Verified AI Risk Agent", version="0.1.0")
+
+from fastapi import Request as _Req
+from fastapi.responses import JSONResponse as _JSONResp
+
+@app.exception_handler(Exception)
+async def unhandled_exception_handler(request: _Req, exc: Exception):
+    """Readable JSON on unexpected errors — the demo UI can render it."""
+    return _JSONResp(status_code=500, content={
+        "error": f"{type(exc).__name__}: {exc}", "path": str(request.url.path)})
 
 # --- deployment topology enforcement (README "Deployment topology" note) ---
 # Prototype: TASDIQ_GATEWAY_SECRET unset -> open surface for judges/evaluators.

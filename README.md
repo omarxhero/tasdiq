@@ -70,7 +70,8 @@ cp .env.example .env            # add your keys (see below)
 python -m pytest tests/ -q      # 20 tests — engine rules, tamper rejection, canary, proportionality policy
 python demo/run_demo.py         # live end-to-end evidence run → evidence/
 python ablation/run.py          # 200-case ablation study
-python -m uvicorn app.main:app --port 8793
+python -m uvicorn app.main:app --port 8793   # first boot auto-generates Ed25519 keys
+                                             # and signs the demo policies — no manual setup
 # → demo UI: http://127.0.0.1:8793/   (customer view + fraud-ops dashboard)
 ```
 
