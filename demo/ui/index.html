@@ -356,6 +356,11 @@ async function fetchChains(){
 async function api(path, body){
   const r = await fetch(path, {method:"POST", headers:{"Content-Type":"application/json"},
     body: body ? JSON.stringify(body) : undefined});
+  if (!r.ok) {                                  // readable server errors, never "Internal S..."
+    let detail = "HTTP " + r.status;
+    try { const e = await r.json(); detail = e.error || JSON.stringify(e).slice(0, 160); } catch (_) {}
+    throw new Error(detail);
+  }
   return r.json();
 }
 async function runScenario(k){ current = k; setScen(k); await pay(); }
@@ -397,7 +402,7 @@ async function replayTxn(){
     <pre>${JSON.stringify(j.intercept_records[0],null,2)}</pre>`);
 }
 async function investigate(){
-  const ids = recentTxns.length ? recentTxns.slice(-3) : [lastTxn];
+  const ids = recentTxns.length ? recentTxns.slice(-3) : (lastTxn ? [lastTxn] : []);
   const cl = {cluster_alert:true, count:ids.length, region:SCEN[current].region, txn_ids:ids};
   const j = await api("/v1/agent/investigate", cl);
   const probes = (j.investigation||[]).map(p => {

@@ -7,7 +7,7 @@ HTTP locally with the auth middleware stubbed and clearly labeled.
 from __future__ import annotations
 import json, threading, time, uuid
 from pathlib import Path
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Body, Depends, FastAPI, HTTPException
 from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel, Field
 
@@ -69,11 +69,11 @@ agent.tools = ToolBelt(vault, nac, ledger, txn_index)
 
 app = FastAPI(title="Tasdiq — Telecom-Verified AI Risk Agent", version="0.1.0")
 
-from fastapi import Request as _Req
+from fastapi import Body, Request
 from fastapi.responses import JSONResponse as _JSONResp
 
 @app.exception_handler(Exception)
-async def unhandled_exception_handler(request: _Req, exc: Exception):
+async def unhandled_exception_handler(request: Request, exc: Exception):
     """Readable JSON on unexpected errors — the demo UI can render it."""
     return _JSONResp(status_code=500, content={
         "error": f"{type(exc).__name__}: {exc}", "path": str(request.url.path)})
@@ -111,7 +111,7 @@ class DecideRequest(BaseModel):
     region_tag: str = "unknown"
     bank: str = "A"
 
-@app.post("/v1/decide", summary="Inline fraud decision (450ms budget, dependencies=[Depends(gateway_guard)])", description="Progressive CAMARA decision rail: phase-1 SIM Swap early exit, phase-2 parallel signals + behavioral scoring, signed policy evaluation. Returns decision, band, step-up allow/prohibit, dual latency, policy hash.")
+@app.post("/v1/decide", summary="Inline fraud decision (450ms budget)", description="Progressive CAMARA decision rail: phase-1 SIM Swap early exit, phase-2 parallel signals + behavioral scoring, signed policy evaluation. Returns decision, band, step-up allow/prohibit, dual latency, policy hash.", dependencies=[Depends(gateway_guard)])
 def decide(req: DecideRequest):
     bundle = _load_bundle(req.bank)
     r = req.model_dump()
@@ -162,7 +162,20 @@ def agent_report(txn_id: str):
     return out
 
 @app.post("/v1/agent/investigate", dependencies=[Depends(gateway_guard)])
-def agent_investigate(cluster: dict):
+def agent_investigate(cluster: dict = Body(default={})):
+    """Tolerant endpoint: accepts any JSON body (or none). Empty/invalid
+    txn references fall back to the most recent decided transactions —
+    the demo button works from any UI state, 422 impossible."""
+    txn_ids = [t for t in (cluster.get("txn_ids") or []) if isinstance(t, str) and t in txn_index]
+    if not txn_ids:
+        txn_ids = list(txn_index.keys())[-3:]   # fall back to most recent decisions
+    if not txn_ids:
+        return {"note": "No decisions on record yet — run a scenario (Pay Now), "
+                        "then investigate.", "selection": {}, "investigation": []}
+    cluster = {"cluster_alert": True,
+               "count": cluster.get("count") or len(txn_ids),
+               "region": cluster.get("region", "—"),
+               "txn_ids": txn_ids}
     return agent.investigate_cluster(cluster)
 
 @app.post("/v1/agent/copilot")
