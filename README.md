@@ -64,6 +64,8 @@ bank ──► /v1/decide ──► [L1 CAMARA: SIM-Swap ▸ Number-Verify ▸ D
 
 ## Quickstart
 
+> **Requires Python 3.10+** (the codebase uses PEP 604 type unions).
+
 ```bash
 pip install -r requirements.txt
 cp .env.example .env            # add your keys (see below)

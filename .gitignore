@@ -26,3 +26,6 @@ evidence/portal/mcp_docs_rendered.txt
 policies/*.signed.json
 keys/*.pub
 demo/MENTOR_SESSION.md
+evidence/portal/mcp_docs_content_KEEP.txt
+evidence/portal/book_p*.png
+evidence/portal/deck_slide*_check.png
