@@ -17,7 +17,7 @@ never the architecture.
 > the engine decides every transaction inline (450ms budget: two 200ms signal phases +
 > 50ms margin); the AI never decides — it explains, investigates, and drafts paperwork.
 
-![Tests](https://img.shields.io/badge/tests-20%2F20-green) ![CAMARA](https://img.shields.io/badge/CAMARA-4%20APIs%20live-blue) ![Ablation](https://img.shields.io/badge/ablation-%2B0.50%20recall-orange)
+![Tests](https://img.shields.io/badge/tests-20%2F20-green) ![CAMARA](https://img.shields.io/badge/CAMARA-4_APIs_%C2%B7_3_live_1_labeled_degraded-blue) ![Ablation](https://img.shields.io/badge/ablation-%2B0.50%20recall-orange)
 
 ---
 
@@ -167,22 +167,53 @@ Scenarios: normal payment · **SIM-swap attack** (early-exit decline) · recent 
 
 ## Results (labeled honestly)
 
-- **Ablation — 200 seeded, feature-varied synthetic cases** (70 SIM-swap ATO · 70
-  snatch-&-run · 60 tricky-clean): bank-only recall **0.50** · telecom-only **0.50** ·
-  **blend 1.00 (0 FP)** — **+0.50 incremental recall from telecom signals**; the two
-  families are complementary. Synthetic validation framework — partner-operator data
-  is Phase 1. *Scaling this dataset from 30 to 200 varied cases caught a real engine
-  bug: rule 0 fired only at confidence exactly 1.0, so cached-fallback swap detections
-  (0.9) escaped the band — fixed to ≥ 0.9.*
-- **Latency:** dual-reported — end-to-end (incl. Nokia sandbox RTT) vs internal
-  execution. The sandbox is shared dev infrastructure; we show its overhead, not hide it.
+- **Ablation — seeded, feature-varied synthetic cases in three splits** (`ablation/run.py`):
+
+  | Split | n | Bank-only | Telecom-only | Blend | Incremental |
+  |---|---|---|---|---|---|
+  | Tune (seed 2026) | 150 | 0.50 | 0.50 | **1.00** | **+0.50** |
+  | **Held-out** (seed 777, never used for rule work) | 50 | 0.49 | 0.51 | **1.00** | **+0.51** |
+  | Boundary hard set (exact-threshold cases) | 8 | 0.50 | 0.25 | **0.75** | +0.25 |
+
+  Zero false positives everywhere. The two signal families are complementary — each
+  alone catches ~half; blended, they catch everything the generator can express.
+  The **boundary set deliberately probes our weak spots** (amounts at exactly 20×,
+  attempts at exactly 5, SIM-swap confidence at exactly 0.9): we publish the 2 misses
+  (sub-threshold amounts with a clean SIM) instead of hiding them. *Earlier, scaling
+  30 copied cases → varied cases caught a real engine bug: rule 0 fired only at
+  confidence exactly 1.0, so cached-fallback swap detections (0.9) escaped the
+  band — fixed to ≥ 0.9.*
+- **Latency — measured, dual-reported** (16 live runs, `evidence/latency_measurements.json`):
+
+  | Metric | End-to-end (incl. sandbox RTT) | Internal execution |
+  |---|---|---|
+  | p50 | **334 ms** | **3 ms** |
+  | p95 | 525 ms | 35 ms |
+
+  Budget met on **94%** of live runs *through the shared dev sandbox*; the two Phase-2
+  network calls run in parallel threads. The sandbox is shared dev infrastructure —
+  we show its overhead, not hide it. Production banks call NaC from their own VPC
+  (sub-50 ms RTT).
 - **Tests:** 20/20 — rule ordering, early exit, Ed25519 tamper rejection, injection,
   canary, breaker behavior, ledger chains, pseudonymization.
 - **Evidence:** `evidence/live_calls/` (first live CAMARA call), `evidence/demo_run/`
   (full live run), `evidence/ablation_results.json`, `evidence/portal/` (UI
   screenshots + official-rules verification).
 
-## Security properties (all demoed live)
+## Threat model → controls (all demoed live)
+
+| Threat | Control |
+|---|---|
+| Insider tampers with bank policy thresholds | Ed25519 maker-checker signatures — tampered bundle rejected (live demo) |
+| SMS/call reaches the attacker during takeover | Band isolation — SMS/voice prohibited on swap & behavioral bands |
+| Attacker floods accounts to trick the agent into skipping probes | Behavioral floor — account pressure disables skips, full sweep forced |
+| Hostile text poisons AI reports | PII-sealed tool belt + schema-locked outputs + structural injection canary (live demo) |
+| Decision history rewritten | Hash-chained dual ledgers + RFC 3161 anchoring + pseudonymized MSISDNs |
+| NaC/carrier outage masks an attack | Confidence → 0, coverage & primary-loss rules escalate; signed degraded-mode fallback |
+| Replay of captured decisions | Policy-hash binding per decision; mTLS + nonce (production deployment) |
+| Public endpoint abuse | Env-gated gateway-signature enforcement + topology note (gateway, mTLS, allowlist, rate limits in prod) |
+
+## Security mechanisms (detail)
 
 - **Ed25519 signed maker-checker policies** — tampered config rejected, never silently honored
 - **Band isolation** — SMS/voice step-up *prohibited* on SIM-swap and behavioral bands

@@ -1,7 +1,7 @@
 """L2 progressive decision engine — deadline-driven, early-exit.
 
 Phase 1 (0–200ms budget): SIM Swap only; swap + amount > multiplier×mean -> DECLINE.
-Phase 2: parallel Number Verify + Device Status + Device Swap + behavioral signals.
+Phase 2: Number Verify (local) + Device Status and Device Swap in parallel threads + behavioral signals.
 Dual latency reporting: end_to_end_ms (incl. sandbox RTT) and internal_ms
 (external network excluded). Sandbox overhead shown, never hidden.
 """
@@ -35,10 +35,16 @@ class DecisionEngine:
                                 ["WEBAUTHN", "IN_APP_BIOMETRIC"], ["SMS", "VOICE"])
 
         # ---- Phase 2: parallel + behavioral --------------------------------
+        # NV is an instant local/degraded path; the two live network calls run in
+        # parallel threads inside the same deadline budget.
         remaining = deadline - (time.perf_counter() - t0)
         nv = self.nac.number_verify(req["msisdn"], req.get("declared_multi_sim", False), remaining)
-        roam = self.nac.roaming(req["msisdn"], remaining)
-        dswap = self.nac.device_swap(req["msisdn"], remaining)
+        from concurrent.futures import ThreadPoolExecutor
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            f_roam = pool.submit(self.nac.roaming, req["msisdn"], remaining)
+            f_dswap = pool.submit(self.nac.device_swap, req["msisdn"], remaining)
+            roam = f_roam.result()
+            dswap = f_dswap.result()
         b = Behavioral(
             beneficiary_first_seen_minutes=req.get("beneficiary_first_seen_minutes", 9999),
             attempts_last_hour=req.get("attempts_last_hour", 0),
@@ -55,7 +61,8 @@ class DecisionEngine:
                 allowed, prohibited, total_risk=None):
         from app.policy import verify_bundle
         end_to_end = int((time.perf_counter() - t0) * 1000)
-        external = sum(r.get("latency_ms", 0) for r in reasons)
+        # parallel fan-out: wall-clock external time = slowest single call, not the sum
+        external = max((r.get("latency_ms", 0) for r in reasons), default=0)
         return {
             "txn_id": req.get("txn_id"), "decision": decision, "band": band,
             "weighted_risk": wr, "total_risk": total_risk if total_risk is not None else wr,

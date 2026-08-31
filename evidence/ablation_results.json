@@ -1,43 +1,113 @@
 {
-  "n_cases": 200,
-  "composition": {
-    "sim_swap_takeover": 70,
-    "snatch_and_run": 70,
-    "clean": 60
-  },
-  "seed": 2026,
-  "results": [
-    {
-      "arm": "bank_only",
-      "TP": 70,
-      "FN": 70,
-      "FP": 0,
-      "TN": 60,
-      "precision": 1.0,
-      "recall": 0.5,
-      "f1": 0.67
+  "splits": {
+    "tune": {
+      "n": 150,
+      "results": [
+        {
+          "arm": "bank_only",
+          "TP": 52,
+          "FN": 52,
+          "FP": 0,
+          "TN": 46,
+          "precision": 1.0,
+          "recall": 0.5,
+          "f1": 0.67
+        },
+        {
+          "arm": "telecom_only",
+          "TP": 52,
+          "FN": 52,
+          "FP": 0,
+          "TN": 46,
+          "precision": 1.0,
+          "recall": 0.5,
+          "f1": 0.67
+        },
+        {
+          "arm": "full_blend",
+          "TP": 104,
+          "FN": 0,
+          "FP": 0,
+          "TN": 46,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        }
+      ],
+      "incremental_recall_telecom": 0.5
     },
-    {
-      "arm": "telecom_only",
-      "TP": 70,
-      "FN": 70,
-      "FP": 0,
-      "TN": 60,
-      "precision": 1.0,
-      "recall": 0.5,
-      "f1": 0.67
+    "held_out": {
+      "n": 50,
+      "results": [
+        {
+          "arm": "bank_only",
+          "TP": 17,
+          "FN": 18,
+          "FP": 0,
+          "TN": 15,
+          "precision": 1.0,
+          "recall": 0.49,
+          "f1": 0.65
+        },
+        {
+          "arm": "telecom_only",
+          "TP": 18,
+          "FN": 17,
+          "FP": 0,
+          "TN": 15,
+          "precision": 1.0,
+          "recall": 0.51,
+          "f1": 0.68
+        },
+        {
+          "arm": "full_blend",
+          "TP": 35,
+          "FN": 0,
+          "FP": 0,
+          "TN": 15,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        }
+      ],
+      "incremental_recall_telecom": 0.51
     },
-    {
-      "arm": "full_blend",
-      "TP": 140,
-      "FN": 0,
-      "FP": 0,
-      "TN": 60,
-      "precision": 1.0,
-      "recall": 1.0,
-      "f1": 1.0
+    "boundary_hard": {
+      "n": 8,
+      "results": [
+        {
+          "arm": "bank_only",
+          "TP": 4,
+          "FN": 4,
+          "FP": 0,
+          "TN": 0,
+          "precision": 1.0,
+          "recall": 0.5,
+          "f1": 0.67
+        },
+        {
+          "arm": "telecom_only",
+          "TP": 2,
+          "FN": 6,
+          "FP": 0,
+          "TN": 0,
+          "precision": 1.0,
+          "recall": 0.25,
+          "f1": 0.4
+        },
+        {
+          "arm": "full_blend",
+          "TP": 6,
+          "FN": 2,
+          "FP": 0,
+          "TN": 0,
+          "precision": 1.0,
+          "recall": 0.75,
+          "f1": 0.86
+        }
+      ],
+      "incremental_recall_telecom": 0.25
     }
-  ],
-  "incremental_recall_telecom": 0.5,
-  "note": "Synthetic validation framework (200 seeded, feature-varied cases: jittered amounts, payee ages, velocities, degraded-signal variants, tricky-but-legitimate cleans). Partner-operator data = Phase 1. Labeled as validation, not production evidence."
+  },
+  "note": "Synthetic validation: tune / held-out / boundary splits, feature-varied, seeded. Partner-operator data = Phase 1. Labeled as validation, not production evidence."
 }

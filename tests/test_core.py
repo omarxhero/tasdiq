@@ -314,3 +314,32 @@ def test_skip_audit_is_hash_chained(tmp_path):
     tampered = chr(10).join(_j.dumps(e) for e in entries)
     open(led.agent_path, 'w', encoding='utf-8').write(tampered)
     assert not led.verify_chains()["agent"]["intact"], "tampered skip entry NOT detected"
+
+
+def test_phase2_network_calls_run_in_parallel():
+    """roaming + device_swap are I/O calls -> must run concurrently.
+    Sequential would take ~2x the sleep; parallel finishes near 1x."""
+    import time as _t
+    from app.engine.decide import DecisionEngine
+
+    class SlowNac:
+        def sim_swap(self, msisdn, hours, deadline_remaining):
+            return Signal("SIM_SWAP", {"swapped": False}, 1.0, 0.0)
+        def number_verify(self, msisdn, dual, deadline_remaining):
+            return Signal("NUMBER_VERIFY", "MATCH", 1.0, 0.0)
+        def roaming(self, msisdn, deadline_remaining):
+            _t.sleep(0.18)
+            return Signal("DEVICE_STATUS", {"roaming": False}, 1.0, 0.0)
+        def device_swap(self, msisdn, deadline_remaining):
+            _t.sleep(0.18)
+            return Signal("DEVICE_SWAP", {"swapped": False}, 1.0, 0.0)
+
+    eng = DecisionEngine(SlowNac())
+    req = {"txn_id": "t-par", "msisdn": "+99999991001", "amount": 100.0,
+           "account_mean": 400.0, "beneficiary_first_seen_minutes": 9999,
+           "attempts_last_hour": 1, "declared_multi_sim": False}
+    t0 = _t.perf_counter()
+    out = eng.decide(dict(req), signed(DEFAULT_BANK_A))
+    elapsed = _t.perf_counter() - t0
+    assert out["decision"] == "APPROVE"
+    assert elapsed < 0.34, f"phase 2 looks sequential: {elapsed:.2f}s"
