@@ -4,4 +4,3 @@ httpx
 cryptography
 python-dotenv
 pytest
-network-as-code

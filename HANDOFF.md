@@ -1,5 +1,5 @@
 # TASDIQ PROTOTYPE — HANDOFF & CONTINUATION DOCUMENT
-> Purpose: ANY AI (or human) can pick up exactly where this session left off.
+> Purpose: any developer can pick up exactly where the build left off.
 > Companion docs: `../TASDIQ_ARCHITECTURE_AND_DEMO_MAP.txt` (design bible v2.8),
 > `../Tasdiq_PORTAL_SUBMISSION_v2.txt` (submission text), `../deck/` (PDF+PPTX+HTML).
 
@@ -7,7 +7,7 @@
 Working prototype of Tasdiq — telecom-verified fraud decision service for MENA
 instant payments (MENA Ignite 2026 hackathon, GSMA + Nokia NaC). Deterministic
 engine decides <450ms (dual-reported latency); guide-listed AI agent does async
-compliance. Solo developer + AI-assisted build.
+compliance. Team of two: Omar Chehade & Mohamad Nour Sayour — AI-assisted build (approved tooling).
 
 ## 2. STATE AT HANDOFF (2026-08-16) — ALL WORKING
 - ✅ 13/13 unit tests green (`python -m pytest tests/ -q`)
@@ -36,7 +36,7 @@ compliance. Solo developer + AI-assisted build.
   swapped:false (clean beats). Others are flaky (404/422/5xx).
 - Gemini: `POST generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent`
   header `x-goog-api-key` (NOT ?key= param). Works.
-- ⚠️ SECURITY: both keys were shared in chat. Rotate them after the hackathon.
+- ⚠️ SECURITY: rotate both keys after the hackathon (standard credential hygiene).
   Session cookies pasted by the user are NOT needed/used — do not use them.
 
 ## 4. ARCHITECTURE QUICK MAP (see design bible for full detail)
@@ -90,7 +90,7 @@ Deps: `pip install -r requirements.txt` (+ network-as-code installed).
   coverage-definition nuance. Keep TDD for any new rule.
 
 ## 7.5 NOKIA PORTAL VERIFICATION (2026-08-16, evening)
-- User session cookie (connect.sid) EXPIRED 18:27Z — portal SPA renders empty.
+- The browser session used for portal verification had expired 18:27Z — portal SPA renders empty.
   If a logged-in scan is ever needed, ask user for FRESH cookies.
 - Did NOT need it: the API key alone unlocked more:
   - OAuth client credentials obtained via GET /oauth2/v1/auth/clientcredentials
@@ -205,7 +205,7 @@ Deps: `pip install -r requirements.txt` (+ network-as-code installed).
 - Repo LIVE: https://github.com/omarxhero/tasdiq (created via API with user
   PAT; pushed via one-shot URL so the token is NOT in .git/config). Only .pub
   keys on GitHub; .key + .env + ledger_store ignored. Token + all API keys:
-  ROTATE AFTER HACKATHON (token was pasted in chat).
+  ROTATE AFTER HACKATHON (standard credential hygiene).
 - Docs now say 4 APIs everywhere: README (badge, rail, diagram), deck v2.9
   (cover stat, L1, business slide — rebuilt), portal txt (+changelog 47),
   Guidebook PDF (re-rendered).

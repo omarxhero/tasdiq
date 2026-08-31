@@ -25,3 +25,4 @@ evidence/portal/mcp_docs_full.txt
 evidence/portal/mcp_docs_rendered.txt
 policies/*.signed.json
 keys/*.pub
+demo/MENTOR_SESSION.md

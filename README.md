@@ -17,7 +17,7 @@ never the architecture.
 > the engine decides every transaction inline (450ms budget: two 200ms signal phases +
 > 50ms margin); the AI never decides — it explains, investigates, and drafts paperwork.
 
-![Tests](https://img.shields.io/badge/tests-20%2F20-green) ![CAMARA](https://img.shields.io/badge/CAMARA-4_APIs_%C2%B7_3_live_1_labeled_degraded-blue) ![Ablation](https://img.shields.io/badge/ablation-%2B0.50%20recall-orange)
+![Tests](https://img.shields.io/badge/tests-21%2F21-green) ![CAMARA](https://img.shields.io/badge/CAMARA-4_APIs_%C2%B7_3_live_1_labeled_degraded-blue) ![Ablation](https://img.shields.io/badge/ablation-%2B0.50%20recall-orange)
 
 ---
 
@@ -67,7 +67,7 @@ bank ──► /v1/decide ──► [L1 CAMARA: SIM-Swap ▸ Number-Verify ▸ D
 ```bash
 pip install -r requirements.txt
 cp .env.example .env            # add your keys (see below)
-python -m pytest tests/ -q      # 20 tests — engine rules, tamper rejection, canary, proportionality policy
+python -m pytest tests/ -q      # 21 tests — engine rules, tamper rejection, canary, proportionality policy
 python demo/run_demo.py         # live end-to-end evidence run → evidence/
 python ablation/run.py          # 200-case ablation study
 python -m uvicorn app.main:app --port 8793   # first boot auto-generates Ed25519 keys
@@ -195,7 +195,7 @@ Scenarios: normal payment · **SIM-swap attack** (early-exit decline) · recent 
   network calls run in parallel threads. The sandbox is shared dev infrastructure —
   we show its overhead, not hide it. Production banks call NaC from their own VPC
   (sub-50 ms RTT).
-- **Tests:** 20/20 — rule ordering, early exit, Ed25519 tamper rejection, injection,
+- **Tests:** 21/21 — rule ordering, early exit, Ed25519 tamper rejection, injection,
   canary, breaker behavior, ledger chains, pseudonymization.
 - **Evidence:** `evidence/live_calls/` (first live CAMARA call), `evidence/demo_run/`
   (full live run), `evidence/ablation_results.json`, `evidence/portal/` (UI
