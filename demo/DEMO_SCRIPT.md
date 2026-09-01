@@ -10,15 +10,14 @@ never apologize for it.
 
 | # | Time | Shot | Say (beats) |
 |---|------|------|-------------|
-| 1 | 0:00–0:15 | Title card (deck slide 1) | "Tasdiq — telecom-verified AI risk agent for MENA instant payments. CAMARA signals, confidence-weighted, in a deterministic engine. Let's stop a real attack." |
-| 2 | 0:15–0:40 | Fraud-ops tab, LIVE badge | "And it's 5G-ready by physics: URLLC transport adds single-digit milliseconds — the 450ms budget is never network-constrained.
-     The dashboard is the bank's fraud-ops view. Three CAMARA APIs — SIM Swap, Number Verification, Device Status — live through Nokia Network-as-Code. Confidence-weighted, never binary." |
-| 3 | 0:40–1:10 | Customer tab → chip "SIM-swap attack" → Pay | "Attacker swaps the SIM, transfers 52,000 EGP — 52× this account's normal. Watch the phone: the customer is protected in under a second. No OTP was ever sent — the SMS channel may belong to the attacker." |
-| 4 | 1:10–1:35 | Result screen + timeline | "Plain language, bilingual: what happened, why, and what the customer should do. Bank sees the same decision signed to a hash-chained ledger." |
-| 5 | 1:35–2:00 | Ops: tamper demo (🔓 Tamper policy) | "Zero-trust: policies are Ed25519-signed under maker-checker. Watch — I modify a threshold in the config… the engine REJECTS the tampered bundle. No silent honoring." |
-| 6 | 2:00–2:25 | Ops: burst (6 rapid attempts) → tripwire → Investigate | "Six attacks, almost at once. The tripwire catches the pattern. The AI doesn't decide whether the money moves — it investigates: it chooses which network checks are worth re-running, calls them itself, brings the evidence back, and drafts the bilingual report. Every tool call is logged." |
-| 7 | 2:25–2:45 | Ops: canary (💉 injection) | "Hostile memo in the transaction — a prompt-injection attempt. Schema-locked output: the report stays clean. Enterprise LLM security, demoed live." |
-| 8 | 2:45–3:00 | Snatch-&-run chip → Face ID | "And the fraud telecom can't see: phone snatched unlocked. Telecom green — but behavior isn't. Step-up: in-app biometric only. SMS prohibited — the thief holds the phone. Tasdiq." |
+| 1 | 0:00–0:15 | Title card (deck slide 1) | "A payment takes seconds. A stolen identity can take even less. This is Tasdiq — we stop the fraud before the money moves." |
+| 2 | 0:15–0:40 | Fraud-ops tab, LIVE badge | "Before the bank releases a payment, Tasdiq asks the network four questions — SIM Swap, Number Verification, Device Status, Device Swap. Live, through Nokia Network as Code. The decision is deterministic — AI doesn't move your money." |
+| 3 | 0:40–1:10 | Customer tab → chip "SIM-swap attack" → Pay | "Now, let's give the system a reason to say no. The SIM was swapped this morning. Fifty-two thousand — fifty-two times normal. Everything looks wrong." |
+| 4 | 1:10–1:35 | Result screen + timeline | "Declined. One third of a second. Notice what didn't happen: no SMS — after a swap, the attacker may own the channel. Tasdiq doesn't just stop the payment — it protects the way you authenticate it." |
+| 5 | 1:35–2:00 | Ops: tamper demo (🔓 Tamper policy) | "But what happens when the attacker gets inside the bank? They try to weaken the gate. Rejected. The policy is signed — change the rules without authorization, and the signature breaks. Security doesn't get negotiated." |
+| 6 | 2:00–2:25 | Ops: burst (6 rapid attempts) → tripwire → Investigate | "Six attacks, almost at once. The tripwire catches the pattern. The AI doesn't decide whether the money moves — it investigates: chooses which network checks are worth re-running, calls them itself, brings the evidence back, drafts the bilingual report. Every tool call is logged." |
+| 7 | 2:25–2:45 | Ops: canary (💉 injection) | "And if someone tries to manipulate the investigator itself? The hostile instruction doesn't become a decision — it becomes evidence. Schema locked. Report clean." |
+| 8 | 2:45–3:00 | Snatch-&-run chip → Face ID | "One last attack. No SIM swap — telecom looks perfectly healthy. But behavior says otherwise. So the network says green… and Tasdiq still demands proof. Face ID. Real owner. Payment released — in seconds, with no SMS ever sent. Because sometimes the thief doesn't steal the SIM. They steal the phone. That's Tasdiq. Thank you." |
 
 ## Beat-by-beat UI map (buttons on http://127.0.0.1:8793)
 - Shot 3: tab "📱 Customer" → chip "🚨 SIM-swap attack" → "Pay now"
