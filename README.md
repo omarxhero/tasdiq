@@ -21,7 +21,7 @@ never the architecture.
 
 ---
 
-## How it works (60 seconds)
+## How it works  
 
 1. Bank calls `POST /v1/decide` with the transaction (amount, payee age, velocity).
 2. **Phase 1 (0–200ms):** SIM Swap check alone. Fresh swap + amount > multiplier×mean
