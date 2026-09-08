@@ -178,8 +178,10 @@ Scenarios: normal payment · **SIM-swap attack** (early-exit decline) · recent 
   | **Held-out** (seed 777, never used for rule work) | 50 | 0.49 | 0.51 | **1.00** | **+0.51** |
   | Boundary hard set (exact-threshold cases) | 8 | 0.50 | 0.25 | **0.75** | +0.25 |
 
-  Zero false positives everywhere. The two signal families are complementary — each
-  alone catches ~half; blended, they catch everything the generator can express.
+  Zero false positives across every generated case — an internal-consistency
+  result on our own generator, **not validated real-world fraud accuracy**
+  (partner-operator data is Phase 1). The two signal families are complementary —
+  each alone catches ~half; blended, they catch everything the generator expresses.
   The **boundary set deliberately probes our weak spots** (amounts at exactly 20×,
   attempts at exactly 5, SIM-swap confidence at exactly 0.9): we publish the 2 misses
   (sub-threshold amounts with a clean SIM) instead of hiding them. *Earlier, scaling
@@ -215,6 +217,16 @@ Scenarios: normal payment · **SIM-swap attack** (early-exit decline) · recent 
 | NaC/carrier outage masks an attack | Confidence → 0, coverage & primary-loss rules escalate; signed degraded-mode fallback |
 | Replay of captured decisions | Policy-hash binding per decision; mTLS + nonce (production deployment) |
 | Public endpoint abuse | Env-gated gateway-signature enforcement + topology note (gateway, mTLS, allowlist, rate limits in prod) |
+
+## Claims boundary (what Tasdiq is — and is not)
+
+Tasdiq produces a **telecom-derived account-takeover risk assessment** and a
+proportionate step-up recommendation. It does **not** establish legal identity,
+authenticate documents, prove the customer authorised the transaction, or cover
+malware, APP scams, mule accounts or deepfakes. The bank remains controller and
+final decision owner; Tasdiq supplies signed, explainable risk evidence. Missing
+or uncertain signals produce an uncertainty code and a proportionate step-up —
+never a silent approval and never a fabricated result.
 
 ## Security mechanisms (detail)
 
