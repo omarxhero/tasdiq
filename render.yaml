@@ -1,0 +1,22 @@
+# Render Blueprint — one web service serves the demo UI and the API
+# Deploy: Render dashboard → New + → Blueprint → pick this repo → paste the two
+# marked keys in the dashboard prompt → Create Service.
+services:
+  - type: web
+    name: tasdiq-demo
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.6"
+      - key: NAC_API_KEY
+        sync: false   # paste your Nokia NaC key in the Render dashboard
+      - key: NAC_BASE_URL
+        value: https://network-as-code.p-eu.apihub.nokia.io
+      - key: GEMINI_API_KEY
+        sync: false   # paste your Google AI Studio key in the Render dashboard
+      - key: GEMINI_MODEL
+        value: gemini-2.5-flash
