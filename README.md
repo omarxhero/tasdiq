@@ -150,6 +150,8 @@ python -m uvicorn app.main:app --port 8793   # first boot auto-generates Ed25519
 # → demo UI: http://127.0.0.1:8793/   (customer view + fraud-ops dashboard)
 ```
 
+> **Windows shortcut:** double-click `START_TASDIQ.bat` — it runs the same boot sequence locally, no manual commands needed.
+
 **`.env` keys (gitignored — never commit):** `NAC_API_KEY`, `NAC_BASE_URL`,
 `GEMINI_API_KEY`, `GEMINI_MODEL`. NaC self-registration is free at
 [networkascode.nokia.io](https://networkascode.nokia.io) (simulator numbers included).
