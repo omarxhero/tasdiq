@@ -52,14 +52,70 @@ never the architecture.
 | **L5** | Dual-ledger audit: Intercept (inline) + Agent (async), HMAC-pseudonymized MSISDNs, RFC 3161 anchor queue |
 
 ```mermaid
-flowchart LR
-    Bank([Bank]) -->|POST /v1/decide| L1["L1 · CAMARA Signal Collection<br/>SIM Swap ▸ Number Verify ▸ Device Status ▸ Device Swap<br/><i>Nokia NaC gateway · per-operator breakers</i>"]
-    L1 --> L2["L2 · Progressive Engine<br/>rules 0–5 + confidence math<br/>+ behavioral signals"]
-    L2 --> L3["L3 · Ed25519 Signed Policy<br/>every decision binds its policy hash"]
-    L2 --> D(["Decision + Band + Step-up"])
-    D --> LED5["L5 · Intercept Ledger<br/>hash-chained · pseudonymized<br/>RFC 3161 anchor queue"]
-    D -.->|seconds later, async| L4["L4 · Async AI Agent<br/>sealed tool belt → CAMARA re-queries<br/>bilingual reports · copilot"]
-    L4 --> LEDA["Agent Ledger"]
+flowchart TB
+    Bank([Bank]) -->|POST /v1/decide| SIG
+
+    subgraph SIG["L1 · CAMARA Signal Collection — per-operator breakers, labeled cached fallback"]
+        L1["Inline rail calls all 4 signals, every payment<br/>SIM Swap · Number Verify · Device Status · Device Swap"]
+    end
+
+    SIG --> ENG
+
+    subgraph ENG["L2/L3 · Progressive Engine — 450 ms budget"]
+        L2["Phase 1: SIM-swap early exit → Phase 2: parallel signals<br/>rules 0–5 · confidence weighting · behavioral floor"]
+        L3["Ed25519 signed policy — tampered bundle rejected, never honored"]
+        L3 -. binds every decision .-> L2
+    end
+
+    ENG --> D(["Decision + Band + Step-up"])
+
+    D --> LED5
+    D -.->|seconds later — never inline| AG
+
+    subgraph LEDG["L5 · Dual audit ledgers"]
+        LED5["Intercept ledger — inline decisions<br/>hash-chained · pseudonymized · RFC 3161 anchor queue"]
+        LEDA["Agent ledger — async actions"]
+    end
+
+    subgraph AGENT["L4 · Async AI Agent — explains and investigates, never decides"]
+        AG["guide-listed model<br/>sealed PII tool belt · proportionality policy · injection canary"]
+        AGR["tripwire cluster → autonomous CAMARA re-queries<br/>bilingual MSA/EN regulator drafts"]
+        AG --> AGR
+    end
+
+    AGR --> LEDA
+```
+
+### The life of a payment — end to end
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant B as Bank
+    participant E as Tasdiq inline rail · 450 ms budget
+    participant N as Nokia NaC · CAMARA
+    participant L as Dual ledgers · hash-chained
+    participant A as Async AI Agent
+
+    B->>E: POST /v1/decide — amount, payee, behavioral context
+    E->>N: Phase 1 · 0–200 ms — SIM Swap
+    alt fresh swap + value above the bank's signed multiplier
+        E-->>B: DECLINE — early exit · band: swap · SMS/voice prohibited
+        note over B,E: the OTP would land on the attacker's SIM — biometric-only, forever
+    else no fresh swap
+        E->>N: Phase 2 · 200–400 ms — Number Verify ∥ Device Status ∥ Device Swap
+        N-->>E: confidence-weighted signals
+        E->>E: rules 0–5 · behavioral scoring · signed policy hash bound
+        E-->>B: APPROVE / ESCALATE / DECLINE + band + step-up policy
+        note over B,E: after any swap signal, step-up collapses to biometric — no SMS is ever sent
+    end
+    E->>L: append decision — pseudonymized MSISDN, chain-linked
+
+    note over A: seconds later — this lane is never on the critical path
+    A->>N: tripwire cluster detected → fresh evidence re-queried per victim
+    A->>A: proportionality policy selects probes · sealed PII tool belt · schema-locked outputs
+    A-->>B: bilingual MSA/EN regulator draft + analyst explanation (human signs)
+    A->>L: agent ledger append — every skip audited and chain-linked
 ```
 
 ### CAMARA link status
