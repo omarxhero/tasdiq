@@ -19,6 +19,8 @@ never the architecture.
 
 ![CI](https://github.com/omarxhero/tasdiq/actions/workflows/ci.yml/badge.svg) ![Tests](https://img.shields.io/badge/tests-21%2F21-green) ![CAMARA](https://img.shields.io/badge/CAMARA-4_APIs_%C2%B7_3_live_1_labeled_degraded-blue) ![Ablation](https://img.shields.io/badge/ablation-%2B0.50%20recall-orange)
 
+> ▶ **Try it live:** [tasdiq-demo.onrender.com](https://tasdiq-demo.onrender.com) — the working prototype, publicly reachable. Free tier: the first load wakes the service in ~30–60 s.
+
 ---
 
 ## How it works  
