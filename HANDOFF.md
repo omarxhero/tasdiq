@@ -1,7 +1,8 @@
 # TASDIQ PROTOTYPE — HANDOFF & CONTINUATION DOCUMENT
 > Purpose: any developer can pick up exactly where the build left off.
-> Companion docs: `../TASDIQ_ARCHITECTURE_AND_DEMO_MAP.txt` (design bible v2.8),
-> `../Tasdiq_PORTAL_SUBMISSION_v2.txt` (submission text), `../deck/` (PDF+PPTX+HTML).
+> Companion docs (team-internal, maintained outside this repo): design bible v2.8,
+> portal submission text, deck sources (PDF+PPTX+HTML). Everything needed to run,
+> test and evaluate the prototype is inside this repository.
 
 ## 1. WHAT THIS IS
 Working prototype of Tasdiq — telecom-verified fraud decision service for MENA

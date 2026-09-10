@@ -17,7 +17,7 @@ never the architecture.
 > the engine decides every transaction inline (450ms budget: two 200ms signal phases +
 > 50ms margin); the AI never decides — it explains, investigates, and drafts paperwork.
 
-![Tests](https://img.shields.io/badge/tests-21%2F21-green) ![CAMARA](https://img.shields.io/badge/CAMARA-4_APIs_%C2%B7_3_live_1_labeled_degraded-blue) ![Ablation](https://img.shields.io/badge/ablation-%2B0.50%20recall-orange)
+![CI](https://github.com/omarxhero/tasdiq/actions/workflows/ci.yml/badge.svg) ![Tests](https://img.shields.io/badge/tests-21%2F21-green) ![CAMARA](https://img.shields.io/badge/CAMARA-4_APIs_%C2%B7_3_live_1_labeled_degraded-blue) ![Ablation](https://img.shields.io/badge/ablation-%2B0.50%20recall-orange)
 
 ---
 
@@ -51,16 +51,31 @@ never the architecture.
 | **L4** | Async AI agent: explanations, bilingual reports, clustering, copilot, injection canary + inline tripwire |
 | **L5** | Dual-ledger audit: Intercept (inline) + Agent (async), HMAC-pseudonymized MSISDNs, RFC 3161 anchor queue |
 
+```mermaid
+flowchart LR
+    Bank([Bank]) -->|POST /v1/decide| L1["L1 · CAMARA Signal Collection<br/>SIM Swap ▸ Number Verify ▸ Device Status ▸ Device Swap<br/><i>Nokia NaC gateway · per-operator breakers</i>"]
+    L1 --> L2["L2 · Progressive Engine<br/>rules 0–5 + confidence math<br/>+ behavioral signals"]
+    L2 --> L3["L3 · Ed25519 Signed Policy<br/>every decision binds its policy hash"]
+    L2 --> D(["Decision + Band + Step-up"])
+    D --> LED5["L5 · Intercept Ledger<br/>hash-chained · pseudonymized<br/>RFC 3161 anchor queue"]
+    D -.->|seconds later, async| L4["L4 · Async AI Agent<br/>sealed tool belt → CAMARA re-queries<br/>bilingual reports · copilot"]
+    L4 --> LEDA["Agent Ledger"]
 ```
-bank ──► /v1/decide ──► [L1 CAMARA: SIM-Swap ▸ Number-Verify ▸ Device-Status ▸ Device-Swap]
-                         │  (Nokia NaC gateway, per-operator breakers)
-                         ▼
-              [L2 engine: rules 0–5 + confidence math] ──► decision + band + step-up
-                         │                                      │
-              [L5 Intercept Ledger]                   [L4 async AI agent]
-              hash-chained · pseudonymized            tool belt → CAMARA re-queries
-              RFC 3161 anchor queue                   bilingual reports · copilot
-```
+
+### CAMARA link status
+
+| # | CAMARA API | State in this repo | Evidence |
+|---|---|---|---|
+| 1 | SIM Swap | Real path — live through the decision pipeline | `evidence/live_calls/camara_first_live_evidence.json` |
+| 2 | Device Swap | Real path — live through the decision pipeline | `evidence/live_calls/device_swap_live_decision.json` |
+| 3 | Device Status | Real path — sandbox | `evidence/live_calls/four_signal_live_decision.json` |
+| 4 | Number Verification | **Labeled-degraded by design** — its consent flow is device-bound (authorization-code-only), so a backend cannot complete it; runs at confidence 0.30, `AUTH_PENDING`, and a degraded signal *tightens* the decision, never opens it | dated attempt log, Sep 2026 |
+| + | Number Recycling *(bonus)* | Tool-belt-only investigation signal, never an inline rail call | `demo/cached_responses/` |
+
+> Number Verification is the one signal with an architectural verdict, not a pending
+> task: the free-tier authorization flow cannot be completed server-side. The engine is
+> built for that — degraded confidence tightens coverage rules and collapses step-up to
+> biometric-only, so the weakest signal produces the strictest posture, never a blind one.
 
 ## Quickstart
 
