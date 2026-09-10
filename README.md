@@ -62,7 +62,7 @@ flowchart TB
     SIG --> ENG
 
     subgraph ENG["L2/L3 · Progressive Engine — 450 ms budget"]
-        L2["Phase 1: SIM-swap early exit → Phase 2: parallel signals<br/>rules 0–5 · confidence weighting · behavioral floor"]
+        L2["Phase 1: SIM-swap early exit → Phase 2: parallel signals<br/>five hard rules + early exit · confidence weighting · behavioral floor"]
         L3["Ed25519 signed policy — tampered bundle rejected, never honored"]
         L3 -. binds every decision .-> L2
     end
@@ -105,7 +105,7 @@ sequenceDiagram
     else no fresh swap
         E->>N: Phase 2 · 200–400 ms — Number Verify ∥ Device Status ∥ Device Swap
         N-->>E: confidence-weighted signals
-        E->>E: rules 0–5 · behavioral scoring · signed policy hash bound
+        E->>E: hard rules · behavioral scoring · signed policy hash bound
         E-->>B: APPROVE / ESCALATE / DECLINE + band + step-up policy
         note over B,E: after any swap signal, step-up collapses to biometric — no SMS is ever sent
     end
@@ -341,7 +341,7 @@ never "certified".
 ```
 app/main.py            FastAPI service + endpoints          app/policy.py      Ed25519 maker-checker
 app/engine/decide.py   pipeline (phases, dual latency)      app/ledger.py      dual ledger + anchors
-app/engine/weighting.py rules 0–5 + confidence math        app/tripwire.py    cluster alarm
+app/engine/weighting.py hard rules + confidence math       app/tripwire.py    cluster alarm
 app/signals/nac.py     NaC client + breakers + fallback     app/ai/agent.py    Gemini agent (schema-locked)
 demo/ui/index.html     two-view demo UI                     app/ai/tools.py    sealed tool belt
 demo/run_demo.py       live evidence run                    ablation/run.py    200-case study
