@@ -238,6 +238,25 @@ never a silent approval and never a fabricated result.
 - **Fail-safe resilience** — per-operator breakers; primary-signal loss + anomaly → escalate;
   signed degraded-mode fallback if the platform is unreachable (attackers buy a stricter posture)
 
+## eSIM-ready device identity & the salami-slice defense
+
+Two operator-validated design points (mentor session, stc partner enablement):
+
+- **eSIM era:** phones now hold up to 10 eSIM profiles with 2 active — profile
+  toggles are normal life and can look like "device changes" to naive engines.
+  Tasdiq's answer: Device Swap is **corroboration-only (risk 20)** — a profile
+  toggle can never escalate alone — and our roadmap adds an **IMEI-anchored
+  device graph**: eSIM toggles change the SIM profile (ICCID) but not the
+  physical phone (IMEI), so the engine separates harmless toggles from real
+  device moves. Operator confirmation of IMEI-level detail is a Phase-1
+  question through our mentor channel.
+- **Salami-slice attacks** (100 tiny payments hoping to slip under the radar):
+  the behavioral radar — velocity, payee age, amount-vs-history — runs on
+  **every payment and costs zero API calls**. Skipping network probes skips
+  cost, never blindness; bank-side daily caps and cooling periods wall in the
+  remainder. Amount-tiered progressive querying (small/quiet payments approve
+  rules-only, $0 network cost) is a production policy knob.
+
 ## Honest scope
 
 Mocks (labeled in-demo): biometric UI, InstaPay end-to-end flow (simulated), Sarie/Aani/FAST
