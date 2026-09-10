@@ -190,9 +190,12 @@ the regional operator core — public-internet BGP routing would waste the 5G UR
 A missing signal is not an opening — it's a tightening. Confidence drops to 0, the
 coverage/primary-loss rules escalate, step-up collapses to biometric-only, and
 high-value instant clearance locks until signals return. Attackers who force a
-degraded state force a stricter bank, not a blinder one. Behavioral floor: ≥2 transactions for the same account within one hour forces
-a full sweep — no skips allowed (attack windows look like busy accounts). In
-the async lane the agent may skip a probe only when independent corroboration
+degraded state force a stricter bank, not a blinder one.
+
+Behavioral floor: ≥2 transactions for the same account within one hour forces
+a full sweep — no skips allowed (attack windows look like busy accounts).
+
+In the async lane the agent may skip a probe only when independent corroboration
 makes it mathematically redundant (e.g. Device Swap already confirmed in a
 prior pass + inline SIM Swap ≥ 0.9); the inline rail always calls all 4 —
 skips happen only after the bank has its decision.
@@ -210,6 +213,20 @@ endpoint — separate from the 4 inline CAMARA APIs.
 
 ## Demo UI (two views)
 
+| 📱 Customer | 🖥 Fraud Ops |
+|---|---|
+| Phone mockup ("Nile Bank — InstaPay"), 5 scenario chips, bilingual AR/EN results, Face-ID step-up ("no SMS was ever sent") | Decision badge + band, confidence bars, step-up chips (SMS ✗ crossed on swap bands), dual latency, tripwire → **AI panel showing each of the agent's 4 CAMARA calls**, tamper + canary buttons, audit chain |
+
+### Screenshots (live demo)
+
+| Customer view — attack stopped | Fraud Ops — agent orchestrating CAMARA |
+|---|---|
+| ![Customer view](evidence/portal/ui_customer_swap_result.png) | ![Agent CAMARA orchestration](evidence/portal/ui_agent_orchestration.png) |
+
+Scenarios: normal payment · **SIM-swap attack** (early-exit decline) · recent swap
+(sensible weighting) · dual-SIM user (downweight, no false alarm) · **snatch-&-run**
+(behavioral detection, biometric-only step-up).
+
 ## Proof the AI works (live capture)
 
 The async agent doesn't just "use AI" as a label — the repo contains captured
@@ -224,20 +241,6 @@ evidence of it orchestrating network APIs by itself:
   `NEW DEVICE` · Number Recycling `RECYCLED — takeover vector`.
 - **Raw captures:** `evidence/live_calls/four_signal_live_decision.json` (all four
   signals live through the pipeline) and `evidence/portal/ui_policy_pass2_selective.png`.
-
-| 📱 Customer | 🖥 Fraud Ops |
-|---|---|
-| Phone mockup ("Nile Bank — InstaPay"), 5 scenario chips, bilingual AR/EN results, Face-ID step-up ("no SMS was ever sent") | Decision badge + band, confidence bars, step-up chips (SMS ✗ crossed on swap bands), dual latency, tripwire → **AI panel showing each of the agent's 4 CAMARA calls**, tamper + canary buttons, audit chain |
-
-### Screenshots (live demo)
-
-| Customer view — attack stopped | Fraud Ops — agent orchestrating CAMARA |
-|---|---|
-| ![Customer view](evidence/portal/ui_customer_swap_result.png) | ![Agent CAMARA orchestration](evidence/portal/ui_agent_orchestration.png) |
-
-Scenarios: normal payment · **SIM-swap attack** (early-exit decline) · recent swap
-(sensible weighting) · dual-SIM user (downweight, no false alarm) · **snatch-&-run**
-(behavioral detection, biometric-only step-up).
 
 ## Results (labeled honestly)
 
