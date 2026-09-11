@@ -357,6 +357,8 @@ demo/DEMO_SCRIPT.md    ≤3-min video script + judge Q&A      HANDOFF.md        
 
 ## Team
 
-Omar Chehade · Mohamad Nour Sayour — Computer & Electrical Engineering, Beirut Arab
-University. Built during the hackathon window (Jul 1 – Sep 13, 2026), AI-assisted with
-approved tooling. Code is original team IP per hackathon rules.
+Omar Chehade — Computer & Electrical Engineering, Beirut Arab University. Solo
+submission: architecture, engine, and AI agent, built during the hackathon window
+(Jul 1 – Sep 13, 2026), AI-assisted with approved tooling. Code is original team IP
+per hackathon rules. Prototype development & validation contributions by
+Mohamad Nour Sayour during the build — credited with gratitude.
